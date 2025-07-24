@@ -1,0 +1,24 @@
+const express = require('express')
+const router = express.Router()
+const multer = require('multer')
+const StaffController = require('../Controllers/StaffController.cjs')
+
+const upload = multer({dest: 'upload/'})
+
+router.post('/login',StaffController.login)
+router.post('/sendLink',StaffController.sendLink)
+router.post('/validateToken',StaffController.validateToken)
+router.post('/changePassword',StaffController.changePassword)
+router.post('/getStaffInfo',StaffController.getStaffInfo)
+router.post('/getStudentList',StaffController.getStudentList)
+router.post('/markAttendance',StaffController.markAttendance)
+router.post('/getAttendance',StaffController.getAttendance)
+router.post('/postAssignment',upload.single('file'),StaffController.postAssignment)
+router.delete('/deleteAssignment',StaffController.deleteAssignment)
+router.post('/getMyGrades',StaffController.getMyGrades)
+router.post('/getAssignments',StaffController.getAssignments)
+router.post('/getTimeline',StaffController.getTimeline)
+router.post('/getRemaining',StaffController.getRemaining)
+router.post('/assignMarks',StaffController.assignMarks)
+
+module.exports = router;

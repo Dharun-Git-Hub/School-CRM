@@ -1,0 +1,86 @@
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { decryptRandom, encryptRandom } from '../../Security/Encryption'
+import TeacherTimetable from './TeacherTimetable'
+
+const TeacherDash = () => {
+    const navigate = useNavigate()
+    const [staffDetails,setStaffDetails] = useState({})
+    const storedEmail = sessionStorage.getItem('email') || null;
+
+    useEffect(()=>{
+        const getStaffInfo = async () => {
+            try{
+                const response = await fetch('http://localhost:3000/staff/getStaffInfo',{
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({emailID:encryptRandom(storedEmail)})
+                })
+                const data = await response.json()
+                console.log(data)
+                if(data.status==='success'){
+                    const decryptedDetails = JSON.parse(decryptRandom(data.staffDetails))
+                    console.log(decryptedDetails)
+                    setStaffDetails(decryptedDetails)
+                }
+                else{
+                    alert(data.message)
+                    return;
+                }
+            }
+            catch(err){
+                console.log(err)
+                return;
+            }
+        }
+        if(storedEmail !== null)
+            getStaffInfo()
+    },[])
+
+    const handleAttendanceClick = async() => {
+        const details = JSON.stringify({
+            name: staffDetails.name,
+            grade: staffDetails.grade,
+            section: staffDetails.section,
+        })
+        try{
+            const response = await fetch('http://localhost:3000/staff/getStudentList',{
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({details:encryptRandom(details)}),
+            })
+            const data = await response.json()
+            console.log(data.list)
+            if(data.status==='success'){
+                navigate('/attendance',{state: {staff: staffDetails,studentList: data.list}})
+            }
+            else{
+                alert('Wait! Retry sometime later!')
+                return;
+            }
+        }
+        catch(err){
+            console.log(err)
+            alert("Something went wrong!")
+            return;
+        }
+    }
+
+    const handleAssignmentClick = () => {
+        navigate('/post-assignment',{state: staffDetails})
+    }
+
+    return (
+        <div>
+            <h1>Welcome, Teacher</h1>
+            <button onClick={handleAttendanceClick}>Mark Attendance</button>
+            <button onClick={handleAssignmentClick}>Post Assignment</button>
+            {
+                staffDetails.hasOwnProperty("email") &&
+                <TeacherTimetable details={{gradeId:staffDetails.grade,sectionId:staffDetails.section,academicYear:"2025-00-00",name: staffDetails.name, subject: staffDetails.subject}}/>
+            }
+        </div>
+    )
+}
+
+export default TeacherDash
