@@ -4,9 +4,14 @@ import SuperGrade from './SuperGrade'
 import SuperStaff from './SuperStaff'
 import SuperAdminStudent from './SuperAdminStudent'
 import SuperAddGradeAdmin from './SuperAddGradeAdmin'
+import { useNavigate } from 'react-router-dom'
+import SuperAdminPanel from '../../Chat/SuperAdminPanel'
+import '../styles/styles.css'
 
-const SuperAdminDash = () => {
-
+const SuperAdminDash = ({socket}) => {
+    const [openChat,setOpenChat] = useState(false)
+    const navigate = useNavigate()
+    
     const handleReset = async() => {
         const opt = confirm('Are you sure?')
         if(opt){
@@ -17,6 +22,7 @@ const SuperAdminDash = () => {
                     const data = await response.json()
                     if(data.status==='success'){
                         alert(data.message)
+                        navigate(0)
                     }
                     else{
                         alert(data.message)
@@ -41,6 +47,12 @@ const SuperAdminDash = () => {
             <SuperStaff/>
             <SuperAdminStudent/>
             <SuperAddGradeAdmin/>
+            <button className='float-btn' style={{right: openChat && '95vw', background: openChat && 'black'}} onClick={()=>setOpenChat(prev=>!prev)}>{!openChat ? 'Chat' : 'Close'}</button>
+            {
+                openChat && 
+                <SuperAdminPanel socket={socket} />
+            }
+            <button onClick={()=>navigate('/super-logs')}>Logs</button>
             <button onClick={handleReset}>Hard Reset</button>
         </div>
     )

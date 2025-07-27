@@ -4,8 +4,9 @@ import GradeAdminStudent from './GradeAdminStudent'
 import GradeSection from './GradeSection'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import GradeAdminPanel from '../../Chat/GradeAdminPanel'
 
-const GradeAdminDash = () => {
+const GradeAdminDash = ({socket}) => {
     const navigate = useNavigate()
     const [myGrade,setMyGrade] = useState('')
 
@@ -39,6 +40,8 @@ const GradeAdminDash = () => {
             <GradeSubject myGrade={myGrade}/>
             <GradeAdminStudent myGrade={myGrade}/>
             <GradeSection myGrade={myGrade}/>
+            {myGrade.trim() !== '' && <GradeAdminPanel socket={socket} grade={myGrade}/>}
+            <button onClick={()=>navigate('/grade-logs')}>Logs</button>
             <button onClick={()=>navigate('/grade-timeslots')}>Timeslots</button>
         </div>
     )

@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { decryptRandom, encryptRandom } from '../../Security/Encryption'
 import TeacherTimetable from './TeacherTimetable'
+import StaffChatPanel from '../../Chat/StaffChatPanel'
 
-const TeacherDash = () => {
+const TeacherDash = ({socket}) => {
     const navigate = useNavigate()
     const [staffDetails,setStaffDetails] = useState({})
     const storedEmail = sessionStorage.getItem('email') || null;
@@ -36,6 +37,10 @@ const TeacherDash = () => {
         if(storedEmail !== null)
             getStaffInfo()
     },[])
+
+    useEffect(()=>{
+        console.log(staffDetails)
+    },[staffDetails])
 
     const handleAttendanceClick = async() => {
         const details = JSON.stringify({
@@ -79,6 +84,7 @@ const TeacherDash = () => {
                 staffDetails.hasOwnProperty("email") &&
                 <TeacherTimetable details={{gradeId:staffDetails.grade,sectionId:staffDetails.section,academicYear:"2025-00-00",name: staffDetails.name, subject: staffDetails.subject}}/>
             }
+            {staffDetails.hasOwnProperty('grade') && <StaffChatPanel socket={socket} gradeFromLogin={staffDetails.grade} sectionFromLogin={staffDetails.section} myMail={staffDetails.email}/>}
         </div>
     )
 }

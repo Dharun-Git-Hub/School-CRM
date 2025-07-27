@@ -6,7 +6,6 @@ import { LoginStaff, ValidateStaff } from '../../slices/Login/LoginStaffSlice';
 const LoginTeacher = () => {
     const [email,setEmail] = useState('');
     const [password,setPassword] = useState('')
-    const [otpPanel,setOTPPanel] = useState(false)
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
@@ -65,13 +64,13 @@ const LoginTeacher = () => {
     }
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
+        <div className='entry' style={{flexDirection:"column"}}>
+            <form className='login-form' onSubmit={handleSubmit}>
                 <input placeholder='Email' type="email" onChange={(e)=>setEmail(e.target.value)} required/>
                 <input placeholder='Password' type="password" onChange={(e)=>setPassword(e.target.value)} required/>
-                <button type='submit'>Login</button>
+                <button style={{padding: "0.3rem 1rem", background: "#333", color: "#fff", marginTop:"10px"}} type='submit'>Login</button>
             </form>
-            <span onClick={()=>navigate('/teacher-forgot')}>Forgot Password?</span>
+            <span className='forgot-btn' onClick={()=>navigate('/teacher-forgot')}>Forgot Password?</span>
         </div>
     )
 }

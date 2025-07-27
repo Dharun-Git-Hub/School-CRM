@@ -78,25 +78,39 @@ const LoginGrade = () => {
                 navigate('/grade-admin-dash')
             }
         }
+        const styles = {
+            division: {
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexDirection: 'column',
+                gap: '2rem'
+            },
+            input: {
+                padding: '0.5rem',
+                borderRadius: "10px",
+                border: 'none'
+            }
+        }
         return (
-            <>
-                <input type='number' placeholder='OTP' onChange={(e)=>setOTP(e.target.value)}/>
-                <button onClick={handleSubmitOTP}>Submit</button>
-            </>
+            <div style={styles.division}>
+                <input style={styles.input} type='number' placeholder='OTP' onChange={(e)=>setOTP(e.target.value)}/>
+                <button style={{padding: "0.3rem 1rem", background: "#333", color: "#fff", marginTop:"10px"}} onClick={handleSubmitOTP}>Submit</button>
+            </div>
         )
     }
     return (
-        <div>
+        <div className='entry'>
             {
             !otpPanel ?
-            <>
-                <form onSubmit={handleSubmit}>
-                    <input placeholder='Email' type="email" onChange={(e)=>setEmail(e.target.value)} required/>
+            <div style={{display: "flex",flexDirection: "column"}}>
+                <form className='login-form' onSubmit={handleSubmit}>
+                    <input autoComplete={'off'} placeholder='Email' type="email" onChange={(e)=>setEmail(e.target.value)} required/>
                     <input placeholder='Password' type="password" onChange={(e)=>setPassword(e.target.value)} required/>
-                    <button type='submit'>Login</button>
+                    <button style={{padding: "0.3rem 1rem", background: "#333", color: "#fff", marginTop:"10px"}} type='submit'>Login</button>
                 </form>
-                <span onClick={()=>navigate('/grade-admin-forgot')}>Forgot Password?</span>
-            </>
+                <span className='forgot-btn' onClick={()=>navigate('/grade-admin-forgot')}>Forgot Password?</span>
+            </div>
             :
                 <OTP/>
             }

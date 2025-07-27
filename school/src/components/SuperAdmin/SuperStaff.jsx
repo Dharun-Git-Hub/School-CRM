@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { encryptRandom } from '../../Security/Encryption'
 
-const Field = ({gradeList,fieldIndex, fieldData, updateField, removeField, sectionList, canRemove}) => {
+const Field = ({gradeList, subjectList, fieldIndex, fieldData, updateField, removeField, sectionList, canRemove}) => {
     const [grades, setGrades] = useState(gradeList)
     const [name,setName] = useState(fieldData.name || '')
     const [email,setEmail] = useState(fieldData.email || '')
@@ -35,6 +35,12 @@ const Field = ({gradeList,fieldIndex, fieldData, updateField, removeField, secti
         else{
             setSection('')
         }
+        if(subjectList.find(el=>el===subject)){
+            updateField(fieldIndex, { name, email, phone, role, grade, section, subject })
+        }
+        else{
+            setSubject('')
+        }
     }, [name, email, phone, role, grade, section, subject])
 
     return (
@@ -60,7 +66,14 @@ const Field = ({gradeList,fieldIndex, fieldData, updateField, removeField, secti
                 }
             </datalist>
             <input placeholder='Section' list="section-list" value={section} onChange={e => setSection(e.target.value)}/>
-            <input placeholder='Subject' value={subject} onChange={e => setSubject(e.target.value)}/>
+            <input placeholder='Subject' list="sub-list" value={subject} onChange={e => setSubject(e.target.value)}/>
+            <datalist id="sub-list">
+                {
+                    subjectList.map((el,index)=>(
+                        <option key={index} value={el}>{el}</option>
+                    ))
+                }
+            </datalist>
             {canRemove && <button type="button" onClick={() => removeField(fieldIndex)}>- Remove Field</button>}
         </div>
     )
@@ -71,6 +84,7 @@ const SuperStaff = () => {
     const [fields, setFields] = useState([{ name: "", email: "", phone: "", role: "", grade: "", section: "", subject: "" }])
     const [gradeList,setGrades] = useState([])
     const [sectionList,setSections] = useState([])
+    const [subjectList,setSubjects] = useState([])
 
     useEffect(()=>{
         const doFirst = async () => {
@@ -94,6 +108,20 @@ const SuperStaff = () => {
                 if(data.status === 'success'){
                     console.log(data.list)
                     setSections(data.list)
+                }
+                else{
+                    alert(data.message)
+                }
+            }
+            catch(err){
+                console.log(err)
+            }
+            try{
+                const response = await fetch('http://localhost:3000/super/getSubjects');
+                const data = await response.json()
+                if(data.status === 'success'){
+                    console.log(data.list)
+                    setSubjects(data.list)
                 }
                 else{
                     alert(data.message)
@@ -202,6 +230,7 @@ const SuperStaff = () => {
                 <Field
                     key={index}
                     gradeList={gradeList}
+                    subjectList={subjectList}
                     fieldIndex={index}
                     fieldData={field}
                     updateField={updateField}

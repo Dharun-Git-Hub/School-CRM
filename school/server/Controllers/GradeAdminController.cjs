@@ -25,7 +25,7 @@ exports.login = async(req,res) => {
     if(exists){
         sendOTP(exists.email)
     }
-    await Logs.insertOne({action:`Grade Admin with email: ${decrypted.email} logged in !`,who: `Grade Admin with MailID: ${decrypted.email}`,to:["Super"]})
+    await Logs.insertOne({action:`Grade Admin with email: ${decrypted.email} logged in !`,who: `Grade Admin with MailID: ${decrypted.email}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super"]})
     return res.json({status:"success"})
 }
 
@@ -64,21 +64,6 @@ exports.getMyGrade = async (req,res) => {
     return res.json({status:"success",grade:exists.grade})
 }
 
-// exports.sendLink = (req,res) => {
-//     const {email} = req.body;
-//     const decrypted = JSON.parse(decryptRandom(email));
-//     console.log(decrypted)
-//     const id = generateID()
-//     try{
-//         sendForgotLink(decrypted,id,"grade-admin-link");
-//         return res.json({status:"success"})
-//     }
-//     catch(err){
-//         console.log(err)
-//         return res.json({status:"failure"})
-//     }
-// }
-
 const idStore = new Map()
 
 exports.sendLink = async (req,res) => {
@@ -93,7 +78,7 @@ exports.sendLink = async (req,res) => {
     console.log(idStore)
     try{
         sendForgotLink(encryptRandom(decrypted.email),encryptRandom(id),"grade-admin-link");
-        await Logs.insertOne({action:`Grade Admin with email: ${decrypted.email} requested to change password`,who: `Grade Admin with MailID: ${decrypted.email}`,to:["Super"]})
+        await Logs.insertOne({action:`Grade Admin with email: ${decrypted.email} requested to change password`,who: `Grade Admin with MailID: ${decrypted.email}`,to:["Super"],time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`})
         return res.json({status:"success"})
     }
     catch(err){
@@ -119,7 +104,7 @@ exports.changePassword = async (req,res) => {
     try{
         idStore.delete(decrypted.email)
         await GradeAdmin.updateOne({email: decrypted.email},{$set:{password:decrypted.newpassword}})
-        await Logs.insertOne({action:`Grade Admin with email: ${decrypted.email} just changed his password as ${decrypted.newpassword} !`,who: `Grade Admin with MailID: ${decrypted.email}`,to:["Super","Grade"]})
+        await Logs.insertOne({action:`Grade Admin with email: ${decrypted.email} just changed his password as ${decrypted.newpassword} !`,who: `Grade Admin with MailID: ${decrypted.email}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super","Grade"]})
         return res.json({status:"success"})
     }
     catch(err){
@@ -166,7 +151,7 @@ exports.uploadExcel = async (req,res) => {
         }
         try{
             await Subject.insertMany(data)
-            await Logs.insertOne({action:`Grade Admin of Grade: ${myGrade} created some subjects with excel file at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${myGrade}`,to:["Super"]})
+            await Logs.insertOne({action:`Grade Admin of Grade: ${myGrade} created some subjects with excel file at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${myGrade}`,to:["Super"]})
             return res.json({status:"success"})
         }
         catch(err){
@@ -203,7 +188,7 @@ exports.uploadManual = async (req,res) => {
     }
     try{
         await Subject.insertMany(data)
-        await Logs.insertOne({action:`Grade Admin of Grade: ${myGrade} created some subjects manually at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${myGrade}`,to:["Super"]})
+        await Logs.insertOne({action:`Grade Admin of Grade: ${myGrade} created some subjects manually at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${myGrade}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super"]})
         return res.json({status:"success"})
     }
     catch(err){
@@ -276,8 +261,13 @@ exports.addTeacherManually = async (req,res) => {
         }
     }
     try{
-        await Teacher.insertMany(decrypted)
-        await Logs.insertOne({action:`Grade Admin of Grade: ${myGrade} appointed teacher(s) manually at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${myGrade}`,to:["Super"]})
+        const data = []
+        for(const i of decrypted){
+            data.push({...i,password:"STAFF"})
+        }
+        console.log(data)
+        await Teacher.insertMany(data)
+        await Logs.insertOne({action:`Grade Admin of Grade: ${myGrade} appointed teacher(s) manually at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${myGrade}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super"]})
         return res.json({status: "success"})
     }
     catch(err){
@@ -349,6 +339,7 @@ exports.addTeacherByExcel = async (req,res) => {
                 grade: Grade,
                 section: Section,
                 subject: Subject,
+                password: "STAFF"
             };
             data.push(temp);
         });
@@ -377,7 +368,7 @@ exports.addTeacherByExcel = async (req,res) => {
                 }
             }
             await Teacher.insertMany(data);
-            await Logs.insertOne({action:`Grade Admin of Grade: ${myGrade} appointed teacher(s) using excel file at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${myGrade}`,to:["Super"]})
+            await Logs.insertOne({action:`Grade Admin of Grade: ${myGrade} appointed teacher(s) using excel file at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${myGrade}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super"]})
             return res.json({status:"success"});
         }
         catch(err){
@@ -411,6 +402,7 @@ exports.addStudentManually = async (req,res) => {
                 address: el.address,
                 attendance: 0,
                 email: el.email,
+                password: "ADMIN"
             }
             modified.push(temp)
         })
@@ -454,7 +446,7 @@ exports.addStudentManually = async (req,res) => {
                 }
             )
         }
-        await Logs.insertOne({action:`Grade Admin of Grade: ${myGrade} registered student(s) manually at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${myGrade}`,to:["Super"]})
+        await Logs.insertOne({action:`Grade Admin of Grade: ${myGrade} registered student(s) manually at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${myGrade}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super"]})
         return res.json({status:"success"})
     }
     catch(err){
@@ -530,6 +522,7 @@ exports.addStudentByExcel = async (req,res) => {
                 admission_no: Number(Admission_No),
                 academic_year: Academic_Year,
                 address: Address,
+                password: "ADMIN",
                 email: Email,
             };
             data.push(temp);
@@ -582,7 +575,7 @@ exports.addStudentByExcel = async (req,res) => {
                     }} }
                 )
             }
-            await Logs.insertOne({action:`Grade Admin of Grade: ${myGrade} appointed student(s) using excel at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${myGrade}`,to:["Super"]})
+            await Logs.insertOne({action:`Grade Admin of Grade: ${myGrade} appointed student(s) using excel at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${myGrade}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super"]})
             return res.json({status:"success"});
         }
         catch(err){
@@ -629,7 +622,7 @@ exports.uploadSectionManually = async(req,res) => {
     }
     try{
         await Section.insertMany(decrypted)
-        await Logs.insertOne({action:`Grade Admin of Grade: ${myGrade} created section(s) manually file at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${myGrade}`,to:["Super"]})
+        await Logs.insertOne({action:`Grade Admin of Grade: ${myGrade} created section(s) manually file at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${myGrade}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super"]})
         return res.json({status:"success",message:"Section(s) Created!"});
     }
     catch(err){
@@ -683,7 +676,7 @@ exports.uploadSectionByExcel = async (req,res) => {
         }
         try{
             await Section.insertMany(data);
-            await Logs.insertOne({action:`Grade Admin of Grade: ${myGrade} registered section(s) using excel at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${myGrade}`,to:["Super"]})
+            await Logs.insertOne({action:`Grade Admin of Grade: ${myGrade} registered section(s) using excel at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${myGrade}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super"]})
             return res.json({status:"success", message: "Section(s) Created!"});
         }
         catch(err){
@@ -750,7 +743,7 @@ exports.addTimeline = async (req,res) => {
     }
     try{
         await Timetable.insertOne(decrypted)
-        await Logs.insertOne({action:`Grade Admin of Grade: ${decrypted.gradeID} added a Timeline/Timeslot for staff: ${decrypted.timeslots.teacher} for Day: ${decrypted.timeslots.day} - Period: ${decrypted.timeslots.period} at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${decrypted.gradeID}`,to:["Super"]})
+        await Logs.insertOne({action:`Grade Admin of Grade: ${decrypted.gradeID} added a Timeline/Timeslot for staff: ${decrypted.timeslots.teacher} for Day: ${decrypted.timeslots.day} - Period: ${decrypted.timeslots.period} at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${decrypted.gradeID}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super"]})
         return res.json({status:"success",message:"Successfully created!"})
     }
     catch(err){
@@ -796,11 +789,43 @@ exports.deleteTimeline = async (req,res) => {
             "timeslots.subject": decrypted.timeslots.subject,
             "timeslots.teacher": decrypted.timeslots.teacher,
         })
-        await Logs.insertOne({action:`Grade Admin of Grade: ${decrypted.gradeID} deleted a Timeline/Timeslot of ${decrypted.timeslots.teacher} for Day: ${decrypted.timeslots.day} - Period: ${decrypted.timeslots.period} at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${decrypted.gradeID}`,to:["Super"]})
+        await Logs.insertOne({action:`Grade Admin of Grade: ${decrypted.gradeID} deleted a Timeline/Timeslot of ${decrypted.timeslots.teacher} for Day: ${decrypted.timeslots.day} - Period: ${decrypted.timeslots.period} at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${decrypted.gradeID}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super"]})
         return res.json({status:"success", message: "Timeline Deleted"})
     }
     catch(err){
         console.log(err)
         return res.json({status:"failure",message: "Something went wrong!"})
+    }
+}
+
+exports.logs = async(req,res) => {
+    try{
+        const response = await Logs.find({
+            to: {
+                $in: "Grade"
+            }
+        })
+        console.log(response)
+        return res.json({status:"success",list:response})
+    }
+    catch(err){
+        return res.json({status:"failure",message:"Something went wrong"})
+    }
+}
+
+exports.getStaffNames = async (req,res) => {
+    const {theGrade} = req.body;
+    try{
+        const response = await Teacher.find({grade:theGrade})
+        console.log(response)
+        const list = []
+        for(let i of response){
+            list.push({email:i.email,section:i.section})
+        }
+        return res.json({status:"success",list})
+    }
+    catch(err){
+        console.log(err)
+        return res.json({status:"failure",message:"Something went wrong"})
     }
 }

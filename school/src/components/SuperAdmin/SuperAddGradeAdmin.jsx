@@ -68,6 +68,7 @@ const SuperAddGradeAdmin = () => {
 
     return (
         <div>
+            <h1>Add Grade Admin</h1>
             <form onSubmit={handleSubmit}>
                 <input type="email" placeholder='Email' value={email} onChange={e=>setEmail(e.target.value)} required/>
                 <input type="password" placeholder='Assign Password' value={password} onChange={e=>setPassword(e.target.value)} required/>

@@ -24,9 +24,38 @@ import Attendance from './components/Teacher/Attendance'
 import PostAssignment from './components/Teacher/PostAssignment'
 import AssignmentPanel from './components/Teacher/AssignmentPanel'
 import Assignments from './components/Student/Assignments'
+import GradeLogs from './components/GradeAdmin/GradeLogs'
+import SuperLogs from './components/SuperAdmin/SuperLogs'
+import { useEffect, useRef, useState } from 'react'
 
 
 const App = () => {
+    const socketRef = useRef(null);
+    const [isSocketReady, setIsSocketReady] = useState(false);
+
+    useEffect(() => {
+        // Initialize socket only once
+        socketRef.current = new WebSocket('ws://localhost:8000');
+
+        socketRef.current.onopen = () => {
+            console.log('[WS] Connected');
+            setIsSocketReady(true);
+        };
+
+        socketRef.current.onclose = () => {
+            console.log('[WS] Disconnected');
+            setIsSocketReady(false);
+        };
+
+        socketRef.current.onerror = (err) => {
+            console.error('[WS] Error:', err);
+        };
+
+        // Cleanup
+        return () => {
+            socketRef.current.close();
+        };
+    }, []);
     return (
         <BrowserRouter>
           <Routes>
@@ -35,17 +64,17 @@ const App = () => {
             <Route path='/login-grade' element={<LoginGrade/>}/>
             <Route path='/login-staff' element={<LoginTeacher/>}/>
             <Route path='/login-student' element={<LoginStudent/>}/>
-            <Route path='/super-admin-dash' element={<SuperAdminDash/>}/>
+            <Route path='/super-admin-dash' element={<SuperAdminDash socket={socketRef.current}/>}/>
             <Route path='/super-admin-forgot' element={<SuperAdminForgot/>}/>
             <Route path='/super-admin-link/:id/:email' element={<SuperAdminLink/>}/>
             <Route path='/super-subject' element={<SuperSubject/>}/>
-            <Route path='/grade-admin-dash' element={<GradeAdminDash/>}/>
+            <Route path='/grade-admin-dash' element={<GradeAdminDash socket={socketRef.current}/>}/>
             <Route path='/grade-admin-forgot' element={<GradeAdminForgot/>}/>
             <Route path='/grade-admin-link/:id/:email' element={<GradeAdminLink/>}/>
-            <Route path='/staff-dash' element={<TeacherDash/>}/>
+            <Route path='/staff-dash' element={<TeacherDash socket={socketRef.current}/>}/>
             <Route path='/teacher-forgot' element={<TeacherForgot/>}/>
             <Route path="/staff-link/:id/:email" element={<TeacherLink/>}/>
-            <Route path='/student-dash' element={<StudentDash/>}/>
+            <Route path='/student-dash' element={<StudentDash socket={socketRef.current}/>}/>
             <Route path='/student-forgot' element={<StudentForgot/>}/>
             <Route path='/student-link/:id/:email' element={<StudentLink/>}/>
             <Route path='/grade-timeslots' element={<GradeTimeSlots/>}/>
@@ -54,6 +83,8 @@ const App = () => {
             <Route path='/post-assignment' element={<PostAssignment/>}/>
             <Route path='/assignment-panel' element={<AssignmentPanel/>}/>
             <Route path='/assignments-student' element={<Assignments/>}/>
+            <Route path="/grade-logs" element={<GradeLogs/>}/>
+            <Route path="/super-logs" element={<SuperLogs/>}/>
             <Route path='*' element={<NotFound/>}/>
           </Routes>
         </BrowserRouter>

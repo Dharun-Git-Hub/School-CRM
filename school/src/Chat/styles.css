@@ -1,0 +1,13 @@
+.list-grade{
+    transition: all 1s ease;
+    animation: 1s open;
+}
+
+@keyframes open {
+    from{
+        width: 300px;
+    }
+    to{
+        width: 60%;
+    }
+}

@@ -17,7 +17,7 @@ exports.login = async(req,res) => {
     if(!exists)
         return res.json({status:"failure",message: "Invalid Email or Password!"});
     const token = jwt.sign({email:decrypted.email},jwtsecret,{expiresIn: "2m"})
-    await Logs.insertOne({action:`Student with email: ${decrypted.email} logged in !`,who: `Student with MailID: ${decrypted.email}`,to:["Super","Grade"]})
+    await Logs.insertOne({action:`Student with email: ${decrypted.email} logged in !`,who: `Student with MailID: ${decrypted.email}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super","Grade"]})
     return res.json({status:"success",token:token})
 }
 
@@ -55,7 +55,7 @@ exports.sendLink = async (req,res) => {
     console.log(idStore)
     try{
         sendForgotLink(encryptRandom(decrypted.email),encryptRandom(id),"student-link");
-        await Logs.insertOne({action:`Student with email: ${decrypted.email} requested to change password`,who: `Student with MailID: ${decrypted.email}`,to:["Super","Grade"]})
+        await Logs.insertOne({action:`Student with email: ${decrypted.email} requested to change password`,who: `Student with MailID: ${decrypted.email}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super","Grade"]})
         return res.json({status:"success"})
     }
     catch(err){
@@ -81,7 +81,7 @@ exports.changePassword = async (req,res) => {
     try{
         idStore.delete(decrypted.email)
         await Student.updateOne({email: decrypted.email},{$set:{password:decrypted.newpassword}})
-        await Logs.insertOne({action:`Student with email: ${decrypted.email} just changed his password as ${decrypted.newpassword} !`,who: `Student with MailID: ${decrypted.email}`,to:["Super","Grade"]})
+        await Logs.insertOne({action:`Student with email: ${decrypted.email} just changed his password as ${decrypted.newpassword} !`,who: `Student with MailID: ${decrypted.email}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super","Grade"]})
         return res.json({status:"success"})
     }
     catch(err){
@@ -154,7 +154,7 @@ exports.submitMyAssignment = async (req,res) => {
                 }
             );
         }
-        await Logs.insertOne({action:`Student with name: ${name}, grade: ${grade}, section: ${section} has Submitted his assignment for the title: ${title} by Teacher: ${teacher}!`,who: `Student with Name: ${name}`,to:["Super","Grade"]})
+        await Logs.insertOne({action:`Student with name: ${name}, grade: ${grade}, section: ${section} has Submitted his assignment for the title: ${title} by Teacher: ${teacher}!`,who: `Student with Name: ${name}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super","Grade"]})
         return res.json({ status: "success", message: "Assignment Submitted!" });
     }catch (err){
         console.error(err);

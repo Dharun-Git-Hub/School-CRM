@@ -1,0 +1,150 @@
+.entry{
+    background-color: whitesmoke;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+.entry-span{
+    font-family: "Helvetica";
+    font-size: 2rem;
+    font-weight: bold;
+    color: #1f1f1f;
+    position: absolute;
+    transform: translateY(-3rem);
+}
+.entry button{
+    cursor: pointer;
+    border-radius: 0.5rem;
+    border: none;
+    transform: scale(1.2);
+    padding: 10px;
+    transition: all 0.4s ease-in;
+    background-color: #cbcaca;
+}
+.entry button:hover{
+    background-color: #222;
+    color: white;
+    box-shadow: 0 0.5rem 0.7rem rgb(164, 163, 163);
+}
+.entry-btn:not(:hover) {
+    filter: blur(0.5px);
+    transform: scale(1);
+    box-shadow: 0 0.5rem 0.7rem rgb(164, 163, 163);
+}
+.login-form{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+.login-form input{
+    width: 15vw;
+    padding: 0.7rem 1rem;
+    border-radius: 1rem;
+    border: none;
+    background-color: #cbcaca;
+    outline: none;
+    margin: 4px;
+}
+.forgot-btn{
+    color: black;
+    text-align: center;
+    margin-top: 22px;
+    font-family: helvetica;
+    font-size: 13px;
+    cursor: pointer;
+}
+.forgot-btn:hover{
+    color: blue;
+}
+.student-h1{
+    font-family: Helvetica;
+    color: #555;
+    position: absolute;
+    top: 2vh;
+    right: 2vw;
+}
+.student-dash-side{
+    position: absolute;
+    left: 0;
+    width: 15vw;
+    height: 100vh;
+    box-shadow: 0 1px 1rem grey;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.student-dash-side .student-h2, .student-h3, .student-h4{
+    background-color: #f4f4f4;
+    cursor: pointer;
+    margin: 10px;
+    padding: 15px;
+    border-radius: 0.9rem;
+    font-size: 21px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: grey;
+    box-shadow: 0 0.3rem 0.7rem silver;
+    transition: 0.2s ease-in;
+}
+.student-dash-side .student-h2:hover, .student-h3:hover, .student-h4:hover{
+    box-shadow: none;
+}
+.student-dash-side .student-h2{
+    font-size: 20px;
+}
+.student-dash-side button{
+    width: 50%;
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+}
+.student-top{
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    color: #222;
+    font-size: 20px;
+    position: absolute;
+    left: 15vw;
+    top: 10vh;
+    width: 83vw;
+    border-top: 1px solid grey;
+}
+.student-top h4{
+    margin-left: 10px;
+}
+.float-btn{
+    position: absolute;
+    right: 2vw;
+    bottom: 5vh;
+    border-radius: 50%;
+    width:50px;
+    height: 50px;
+    border: none;
+    box-shadow: 0 5px 5px silver;
+    z-index: 200;
+    background-color: blueviolet;
+    color: white;
+    font-family: 'Poppins';
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.float-btn:hover{
+    transform: scale(1.15);
+}
+.float-btn:hover::after{
+    content: 'Chat';
+    position: absolute;
+    bottom: 8vh;
+    left: 0;
+    width: 100%;
+    height: fit-content;
+    background-color: white;
+    box-shadow: 0 0.5rem 1rem silver;
+    color: black;
+    border-radius: 10px;
+    font-size: 0.8rem;
+}

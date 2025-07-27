@@ -8,7 +8,7 @@ const Teacher = require('../Schemas/Teacher/TeacherSchema.cjs')
 const Student = require('../Schemas/Student/StudentSchema.cjs')
 const Timetable = require('../Schemas/TimeTable/TimeTableSchema.cjs')
 const GradeAdmin = require('../Schemas/GradeAdmin/GradeAdminLoginSchema.cjs')
-const Subject = require('../Schemas/Subject/SubjectSchema.cjs')
+const Assignment = require('../Schemas/Assignment/AssignmentSchema.cjs')
 const Section = require('../Schemas/Section/SectionSchema.cjs')
 const Logs = require('../Schemas/Logs/LogSchema.cjs')
 const jwt = require('jsonwebtoken')
@@ -272,7 +272,12 @@ exports.addTeacherManually = async (req,res) => {
         }
     }
     try{
-        await Teacher.insertMany(decrypted)
+        const data = []
+        for(const i of decrypted){
+            data.push({...i,password:"STAFF"})
+        }
+        console.log(data)
+        await Teacher.insertMany(data)
         return res.json({status: "success"})
     }
     catch(err){
@@ -343,6 +348,7 @@ exports.addTeacherByExcel = async (req,res) => {
                 grade: Grade,
                 section: Section,
                 subject: Subject,
+                password: "STAFF"
             };
             data.push(temp);
         });
@@ -424,6 +430,7 @@ exports.addStudentManually = async (req,res) => {
                 academic_year: el.acyear,
                 address: el.address,
                 attendance: 0,
+                password: "ADMIN"
             }
             modified.push(temp)
         })
@@ -526,6 +533,7 @@ exports.addStudentByExcel = async (req,res) => {
                 admission_no: Number(Admission_No),
                 academic_year: Academic_Year,
                 address: Address,
+                password: "ADMIN"
             };
             data.push(temp);
         });
@@ -594,8 +602,8 @@ exports.createGradeAdmin = async (req,res) => {
     const {email,password,grade} = decrypted;
     const exists = await GradeAdmin.exists({email:email})
     if(exists) return res.json({status:"failure",message:"Grade admin already found!"});
-    const graded = await GradeAdmin.exists({email:email, grade: grade})
-    if(exists) return res.json({status:"failure",message:"Grade admin already found!"});
+    const graded = await GradeAdmin.exists({grade: grade})
+    if(exists || graded) return res.json({status:"failure",message:"Grade admin already found!"});
     try{
         await GradeAdmin.insertOne({email,password,grade})
         return res.json({status:"success", message:"Grade Admin Registered!"});
@@ -623,10 +631,36 @@ exports.resetAll = async(req,res) => {
             password: "123",
             grade: "4"
         })
-        return res.json({status:"success",message:"Everything has RESET!"})
+        return res.json({status:"success",message:"Everything was RESET!"})
     }
     catch(err){
         console.log(err)
         return res.json({status:"failure", message:"Something went wrong!"});
     }
+}
+
+exports.logs = async(req,res) => {
+    try{
+        const response = await Logs.find({
+            to: {
+                $in: "Super"
+            }
+        })
+        console.log(response)
+        return res.json({status:"success",list:response})
+    }
+    catch(err){
+        return res.json({status:"failure",message:"Something went wrong"})
+    }
+}
+
+exports.retrieveGrades = async (req,res) => {
+    const {list} = req.body;
+    const map = new Map()
+    for(let email of list){
+        const grades = await GradeAdmin.findOne({email:email})
+        map.set(email,grades.grade)
+    }
+    const result = Array.from(map.entries())
+    return res.json({status:"success",mapped:result})
 }

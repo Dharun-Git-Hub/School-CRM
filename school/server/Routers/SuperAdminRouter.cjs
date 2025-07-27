@@ -20,6 +20,8 @@ router.post('/addStudentManually',SuperAdminController.addStudentManually)
 router.get('/getSubjects',SuperAdminController.getSubjects)
 router.post('/addStudentByExcel',upload.single('file'),SuperAdminController.addStudentByExcel)
 router.post('/createGradeAdmin',SuperAdminController.createGradeAdmin)
+router.get('/logs',SuperAdminController.logs)
+router.post('/retrieveGrades',SuperAdminController.retrieveGrades)
 router.get('/resetAll',SuperAdminController.resetAll)
 
 module.exports = router

@@ -1,6 +1,7 @@
 const Student = require('../Schemas/Student/StudentSchema.cjs');
 const TeacherModel = require('../Schemas/Teacher/TeacherSchema.cjs')
 const Timetable = require('../Schemas/TimeTable/TimeTableSchema.cjs')
+const GradeAdmin = require('../Schemas/GradeAdmin/GradeAdminLoginSchema.cjs')
 const Section = require('../Schemas/Section/SectionSchema.cjs')
 const Assignment = require('../Schemas/Assignment/AssignmentSchema.cjs')
 const { decryptRandom, encryptRandom } = require('../Helpers/Cryptors.cjs');
@@ -20,7 +21,7 @@ exports.login = async(req,res) => {
     if(!exists)
         return res.json({status:"failure",message: "Invalid Email or Password!"});
     const token = jwt.sign({email:decrypted.email},jwtsecret,{expiresIn: "2m"})
-    await Logs.insertOne({action:`Staff with email: ${decrypted.email} logged in !`,who: `Staff with MailID: ${decrypted.email}`,to:["Super","Grade"]})
+    await Logs.insertOne({action:`Staff with email: ${decrypted.email} logged in !`,who: `Staff with MailID: ${decrypted.email}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super","Grade"]})
     return res.json({status:"success",token:token})
 }
 
@@ -52,7 +53,7 @@ exports.sendLink = async (req,res) => {
     console.log(idStore)
     try{
         sendForgotLink(encryptRandom(decrypted.email),encryptRandom(id),"staff-link");
-        await Logs.insertOne({action:`Staff with email: ${decrypted.email} requested to change password`,who: `Staff with MailID: ${decrypted.email}`,to:["Super","Grade"]})
+        await Logs.insertOne({action:`Staff with email: ${decrypted.email} requested to change password`,who: `Staff with MailID: ${decrypted.email}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super","Grade"]})
         return res.json({status:"success"})
     }
     catch(err){
@@ -78,7 +79,7 @@ exports.changePassword = async (req,res) => {
     try{
         idStore.delete(decrypted.email)
         await TeacherModel.updateOne({email: decrypted.email},{$set:{password:decrypted.newpassword}})
-        await Logs.insertOne({action:`Staff with email: ${decrypted.email} just changed his password as ${decrypted.newpassword} !`,who: `Staff with MailID: ${decrypted.email}`,to:["Super","Grade"]})
+        await Logs.insertOne({action:`Staff with email: ${decrypted.email} just changed his password as ${decrypted.newpassword} !`,who: `Staff with MailID: ${decrypted.email}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super","Grade"]})
         return res.json({status:"success"})
     }
     catch(err){
@@ -153,11 +154,11 @@ exports.markAttendance = async (req,res) => {
                     { section,grade,year,month,day },
                     { $set: { students } }
                 )
-                await Logs.insertOne({action:`Staff with name: ${name} just updated attendance for grade: ${grade}, section: ${section} for Date: ${day}-${month}-${year}`,who: `Staff with name: ${name}`,to:["Super","Grade"]})
+                await Logs.insertOne({action:`Staff with name: ${name} just updated attendance for grade: ${grade}, section: ${section} for Date: ${day}-${month}-${year}`,who: `Staff with name: ${name}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super","Grade"]})
                 return res.json({status:"success",message:"Attendance Marked!"})
             }
             else{
-                await Logs.insertOne({action:`Staff with name: ${name} just marked attendance for grade: ${grade}, section: ${section} for Date: ${day}-${month}-${year}`,who: `Staff with name: ${name}`,to:["Super","Grade"]})
+                await Logs.insertOne({action:`Staff with name: ${name} just marked attendance for grade: ${grade}, section: ${section} for Date: ${day}-${month}-${year}`,who: `Staff with name: ${name}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super","Grade"]})
                 await Attendance.insertOne(decrypted);
                 return res.json({status:"success",message:"Attendance Marked!"})
             }
@@ -227,7 +228,7 @@ exports.postAssignment = async (req,res) => {
     console.log(details)
     try{
         await Assignment.insertOne(details);
-        await Logs.insertOne({action:`Staff with name: ${teacher} just posted an Assignment for grade: ${grade}, section: ${section} for Date: ${new Date().toLocaleDateString()}`,who: `Staff with name: ${teacher}`,to:["Super","Grade"]})
+        await Logs.insertOne({action:`Staff with name: ${teacher} just posted an Assignment for grade: ${grade}, section: ${section} for Date: ${new Date().toLocaleDateString()}`,who: `Staff with name: ${teacher}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super","Grade"]})
         return res.json({status:"success",message:"Assignment posted succesfully!"});
     }
     catch(err){
@@ -245,7 +246,7 @@ exports.deleteAssignment =async (req,res) => {
             return res.json({status:"failure",message:"The Assignment not found!"})
         }
         await Assignment.deleteOne({title:decrypted.title,date:decrypted.date.toString()})
-        await Logs.insertOne({action:`Staff with name: ${decrypted.teacher} just deleted an Assignment for grade: ${decrypted.grade}, section: ${decrypted.section} for Date: ${new Date().toLocaleDateString()}`,who: `Staff with name: ${decrypted.teacher}`,to:["Super","Grade"]})
+        await Logs.insertOne({action:`Staff with name: ${decrypted.teacher} just deleted an Assignment for grade: ${decrypted.grade}, section: ${decrypted.section} for Date: ${new Date().toLocaleDateString()}`,who: `Staff with name: ${decrypted.teacher}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super","Grade"]})
         return res.json({status:"success",message:"Assignment deleted successfully!"})
     }
     catch(err){
@@ -366,8 +367,21 @@ exports.assignMarks = async (req,res) => {
             )
             console.log(updated)
         }
-        await Logs.insertOne({action:`Staff with name: ${teacher} just assigned marks for students of grade: ${grade}, section: ${section} for Date: ${new Date().toLocaleDateString()}\nSubject: ${subject}, Title: ${title}`,who: `Staff with name: ${teacher}`,to:["Super","Grade"]})
+        await Logs.insertOne({action:`Staff with name: ${teacher} just assigned marks for students of grade: ${grade}, section: ${section} for Date: ${new Date().toLocaleDateString()}\nSubject: ${subject}, Title: ${title}`,who: `Staff with name: ${teacher}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super","Grade"]})
         return res.json({status:"success",message:"Marks and Feedbacks are scored successfully!"})
+    }
+    catch(err){
+        console.log(err)
+        return res.json({status:"failure",message:"Something went wrong!"})
+    }
+}
+
+exports.loadGradeName = async (req,res) => {
+    const {details} = req.body;
+    try{
+        const result = await GradeAdmin.findOne({grade:details.gradeFromLogin})
+        console.log(result)
+        return res.json({status:"success",list:result.email})
     }
     catch(err){
         console.log(err)
