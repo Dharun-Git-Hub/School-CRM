@@ -89,12 +89,18 @@ const LoginGrade = () => {
             input: {
                 padding: '0.5rem',
                 borderRadius: "10px",
-                border: 'none'
+                border: 'none',
+                fontFamily: 'Poppins'
+            }
+        }
+        const handleKey = (e) => {
+            if(e.key==='Enter'){
+                handleSubmitOTP()
             }
         }
         return (
             <div style={styles.division}>
-                <input style={styles.input} type='number' placeholder='OTP' onChange={(e)=>setOTP(e.target.value)}/>
+                <input style={styles.input} type='number' placeholder='OTP' onChange={(e)=>setOTP(e.target.value)} onKeyDown={(e)=>{handleKey(e)}}/>
                 <button style={{padding: "0.3rem 1rem", background: "#333", color: "#fff", marginTop:"10px"}} onClick={handleSubmitOTP}>Submit</button>
             </div>
         )

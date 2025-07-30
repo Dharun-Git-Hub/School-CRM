@@ -4,7 +4,9 @@ const { sendForgotLink, generateID } = require('../Helpers/SendEmail.cjs');
 const jwtsecret = 'jwtsecret'
 const Student = require('../Schemas/Student/StudentSchema.cjs')
 const Assignment = require('../Schemas/Assignment/AssignmentSchema.cjs')
+const Teacher = require('../Schemas/Teacher/TeacherSchema.cjs')
 const Attendance = require('../Schemas/Attendance/AttendanceSchema.cjs')
+const Timetable = require('../Schemas/TimeTable/TimeTableSchema.cjs')
 const Logs = require('../Schemas/Logs/LogSchema.cjs')
 const fs = require('fs')
 
@@ -180,10 +182,41 @@ exports.getAttendancePercent = async(req,res) => {
         console.log('Absent: ',absent)
         const percent = (presentDays / totalDays) * 100
         console.log(percent)
-        return res.json({status:"success",percentage:percent})
+        return res.json({status:"success",percentage:Number(percent.toPrecision(4))})
     }
     catch(err){
         console.log(err)
         return res.json({status:"failure",message:"Something went wrong"})
+    }
+}
+
+exports.getStaffEmail = async (req,res) => {
+    const {details} = req.body;
+    console.log(details)
+    try{
+        const result = await Teacher.findOne({
+            grade: details.grade,
+            section: details.section
+        })
+        console.log(result)
+        return res.json({status:"success",toMail:result.email})
+    }
+    catch(err){
+        console.log(err)
+        return res.json({status:"failure",message:"Something went wrong"})
+    }
+}
+
+exports.getTimeline = async (req,res) => {
+    const {details} = req.body
+    const {gradeId,sectionId} = JSON.parse(decryptRandom(details))
+    console.log('Section: ',gradeId)
+    try{
+        const result = await Timetable.find({gradeID: gradeId, sectionID: sectionId})
+        return res.json({status:"success",list:result})
+    }
+    catch(err){
+        console.log(err)
+        return res.json({status:"failure",message:"Something went wrong!"})
     }
 }

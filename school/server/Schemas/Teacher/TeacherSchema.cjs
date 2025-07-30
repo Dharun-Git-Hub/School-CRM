@@ -8,6 +8,7 @@ const TeacherSchema = new mongoose.Schema({
     grade: String,
     section: String,
     subject: String,
+    code: String,
     password: String,
 })
 

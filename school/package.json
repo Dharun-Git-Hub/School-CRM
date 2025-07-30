@@ -4,14 +4,16 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently \"vite\" \"node server/main.cjs\" \"node server/Chat/socket.cjs\" ",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "npm run dev"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.2",
     "bcrypt": "^6.0.0",
+    "concurrently": "^9.2.0",
     "cors": "^2.8.5",
     "crypto-js": "^4.2.0",
     "cryptojs": "^2.5.3",

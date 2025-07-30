@@ -1,7 +1,13 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
+import { useLocation } from 'react-router-dom'
+import { ChatContext } from '../../Context/ChatContext'
+import GradeAdminPanel from '../../Chat/GradeAdminPanel'
 
 const GradeLogs = () => {
     const [logs,setLogs] = useState([])
+    const location = useLocation()
+    const myGrade = location.state || null
+    const {socketConn} = useContext(ChatContext)
 
     useEffect(()=>{
         const doFirst = async () => {
@@ -24,8 +30,7 @@ const GradeLogs = () => {
         doFirst()
     },[])
     return (
-        <div>
-            Logs
+        <div className='logs-cont'>
             <ul>
                 {
                     logs.map((el,index)=>(
@@ -37,6 +42,10 @@ const GradeLogs = () => {
                     ))
                 }
             </ul>
+            <div>
+                {socketConn && myGrade.trim() !== '' && <GradeAdminPanel socket={socketConn} grade={myGrade}/>}
+            </div>
+            
         </div>
     )
 }

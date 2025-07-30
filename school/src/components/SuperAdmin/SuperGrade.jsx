@@ -84,6 +84,12 @@ const SuperGrade = () => {
             })
             const data = await response.json()
             console.log(data)
+            if(data.status==='success'){
+                alert('Uploaded Successfully')
+            }
+            else{
+                alert('Grade Creation failed')
+            }
         }
         catch(err){
             console.log(err)
@@ -91,7 +97,7 @@ const SuperGrade = () => {
     }
 
     return (
-        <div>
+        <div className='dash-div'>
             <h1>Add Grade</h1>
             <input type="file" accept='.xlsx' onChange={e=>setFile(e.target.files[0])}/>
             <button onClick={handleUpload}>Upload using Excel File</button>
@@ -108,7 +114,7 @@ const SuperGrade = () => {
                 ))
             }
             <button onClick={addGrade}>Add Grade</button>
-            <button onClick={handleAddGrade}>Create Grades</button>
+            <button style={{background: '#1f1f1f',color:'white'}} onClick={handleAddGrade}>Create Grades</button>
         </div>
     )
 }

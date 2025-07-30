@@ -24,7 +24,7 @@ const SuperLogs = () => {
         doFirst()
     },[])
     return (
-        <div>
+        <div className='logs-cont'>
             Logs
             <ul>
                 {

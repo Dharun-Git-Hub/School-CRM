@@ -27,6 +27,8 @@ import Assignments from './components/Student/Assignments'
 import GradeLogs from './components/GradeAdmin/GradeLogs'
 import SuperLogs from './components/SuperAdmin/SuperLogs'
 import { useEffect, useRef, useState } from 'react'
+import { ChatProvider } from './Context/ChatContext'
+import NotificationDisplay from './Context/NotificationDisplay'
 
 
 const App = () => {
@@ -34,30 +36,29 @@ const App = () => {
     const [isSocketReady, setIsSocketReady] = useState(false);
 
     useEffect(() => {
-        // Initialize socket only once
         socketRef.current = new WebSocket('ws://localhost:8000');
 
         socketRef.current.onopen = () => {
-            console.log('[WS] Connected');
+            console.log('WS Connected');
             setIsSocketReady(true);
         };
 
         socketRef.current.onclose = () => {
-            console.log('[WS] Disconnected');
+            console.log('WS Disconnected');
             setIsSocketReady(false);
         };
 
         socketRef.current.onerror = (err) => {
-            console.error('[WS] Error:', err);
+            console.error('WS Error:', err);
         };
 
-        // Cleanup
         return () => {
             socketRef.current.close();
         };
     }, []);
     return (
         <BrowserRouter>
+        <ChatProvider>
           <Routes>
             <Route path='/' element={<Entry/>}/>
             <Route path='/login-super' element={<LoginSuper/>}/>
@@ -87,6 +88,8 @@ const App = () => {
             <Route path="/super-logs" element={<SuperLogs/>}/>
             <Route path='*' element={<NotFound/>}/>
           </Routes>
+          <NotificationDisplay/>
+          </ChatProvider>
         </BrowserRouter>
     )
 }

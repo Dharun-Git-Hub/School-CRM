@@ -51,6 +51,7 @@ const TeacherTimetable = ({details}) => {
                 }))})
             });
             const data = await response.json();
+            console.log(data)
             if(data.status === 'success'){
                 console.log(data.list)
                 setTimetable(data.list);
@@ -83,12 +84,12 @@ const TeacherTimetable = ({details}) => {
     };
 
     return (
-        <div style={{ padding: "20px" }}>
+        <div style={{ padding: "20px", fontFamily: 'Poppins' }}>
             <h1>Timetable</h1>
-            <h2>Grade: {details.gradeId}</h2>
+            <h2 style={{color: 'gr#333ey',fontSize: '1.2rem'}}>Grade:</h2>{details.gradeId}
             <h3>Section: {details.sectionId}</h3>
             
-            <table border="1" style={{ width: "100%", borderCollapse: "collapse" }}>
+            <table className="teacher-timetable" border="1" style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
                     <tr>
                         <th>Day / Period</th>
@@ -121,8 +122,8 @@ const TeacherTimetable = ({details}) => {
                                     >
                                         {detailsSlot ? (
                                             <>
-                                                <div><strong>{detailsSlot.timeslots?.subject === details.subject ? "Grade: "+detailsSlot.gradeID : ""}</strong></div>
-                                                <div style={{ fontSize: "0.8em" }}>{detailsSlot.timeslots?.teacher === details.name? detailsSlot.sectionID : ""}</div>
+                                                <div style={{margin: '10px'}}><strong style={{color: '#333'}}>{detailsSlot.timeslots?.subject === details.subject ? "Grade: "+detailsSlot.gradeID : ""} -</strong></div>
+                                                <div style={{ fontSize: "1rem" }}>{detailsSlot.timeslots?.teacher === details.name? detailsSlot.sectionID : ""}</div>
                                             </>
                                         ) : '-'}
                                     </td>

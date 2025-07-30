@@ -10,6 +10,7 @@ const Field = ({gradeList, subjectList, fieldIndex, fieldData, updateField, remo
     const [grade, setGrade] = useState(fieldData.grade || '')
     const [section, setSection] = useState(fieldData.section || '')
     const [subject, setSubject] = useState(fieldData.subject || '')
+    const [code,setCode] = useState(fieldData.code || '')
 
     useEffect(() => {
         setName(fieldData.name || '')
@@ -19,29 +20,30 @@ const Field = ({gradeList, subjectList, fieldIndex, fieldData, updateField, remo
         setGrade(fieldData.grade || '')
         setSection(fieldData.section || '')
         setSubject(fieldData.subject || '')
+        setCode(fieldData.code || '')
     }, [fieldData.name, fieldData.email, fieldData.phone, fieldData.role, fieldData.grade, fieldData.section, fieldData.subject])
 
     useEffect(() => {
         if(gradeList.find(el=>el===grade)){
-            updateField(fieldIndex, { name, email, phone, role, grade, section, subject })
+            updateField(fieldIndex, { name, email, phone, role, grade, section, subject, code })
         }
         else{
             setGrade('')
         }
         const exists = sectionList.filter(el=>el.grade===grade)
         if(exists.find(el=>el.name===section)){
-            updateField(fieldIndex, { name, email, phone, role, grade, section, subject })
+            updateField(fieldIndex, { name, email, phone, role, grade, section, subject, code })
         }
         else{
             setSection('')
         }
         if(subjectList.find(el=>el===subject)){
-            updateField(fieldIndex, { name, email, phone, role, grade, section, subject })
+            updateField(fieldIndex, { name, email, phone, role, grade, section, subject, code })
         }
         else{
             setSubject('')
         }
-    }, [name, email, phone, role, grade, section, subject])
+    }, [name, email, phone, role, grade, section, subject, code])
 
     return (
         <div style={{border: '1px solid #ccc', padding: 10, marginBottom: 10}}>
@@ -74,6 +76,7 @@ const Field = ({gradeList, subjectList, fieldIndex, fieldData, updateField, remo
                     ))
                 }
             </datalist>
+            <input placeholder='Subject Code' value={code} onChange={e => setCode(e.target.value)}/>
             {canRemove && <button type="button" onClick={() => removeField(fieldIndex)}>- Remove Field</button>}
         </div>
     )
@@ -81,7 +84,7 @@ const Field = ({gradeList, subjectList, fieldIndex, fieldData, updateField, remo
 
 const SuperStaff = () => {
     const [file,setFile] = useState(null)
-    const [fields, setFields] = useState([{ name: "", email: "", phone: "", role: "", grade: "", section: "", subject: "" }])
+    const [fields, setFields] = useState([{ name: "", email: "", phone: "", role: "", grade: "", section: "", subject: "", code: "" }])
     const [gradeList,setGrades] = useState([])
     const [sectionList,setSections] = useState([])
     const [subjectList,setSubjects] = useState([])
@@ -103,8 +106,9 @@ const SuperStaff = () => {
                 console.log(err)
             }
             try{
-                const response = await fetch('http://localhost:3000/grade/getSections');
+                const response = await fetch('http://localhost:3000/super/getSections');
                 const data = await response.json()
+                console.log(data)
                 if(data.status === 'success'){
                     console.log(data.list)
                     setSections(data.list)
@@ -135,7 +139,7 @@ const SuperStaff = () => {
     },[])
 
     const addField = () => {
-        setFields(prev => [...prev, { name: "", email: "", phone: "", role: "", grade: "", section: "", subject: "" }])
+        setFields(prev => [...prev, { name: "", email: "", phone: "", role: "", grade: "", section: "", subject: "", code: "" }])
     }
     const removeField = (index) => {
         setFields(prev => prev.filter((_, i) => i !== index))
@@ -182,7 +186,7 @@ const SuperStaff = () => {
             return
         }
         for(let i=0;i<fields.length;i++){
-            if(fields[i].name.trim() === '' || fields[i].email.trim() === '' || fields[i].phone.trim() === '' || fields[i].role.trim() === '' || fields[i].grade.trim() === '' || fields[i].section.trim() === '' || fields[i].subject.trim() === ''){
+            if(fields[i].name.trim() === '' || fields[i].email.trim() === '' || fields[i].phone.trim() === '' || fields[i].role.trim() === '' || fields[i].grade.trim() === '' || fields[i].section.trim() === '' || fields[i].subject.trim() === '' || fields[i].subject.trim() === ''){
                 alert('Fill up all the fields!')
                 return;
             }
@@ -206,7 +210,7 @@ const SuperStaff = () => {
             console.log(data)
             if(data.status === 'success'){
                 alert('Teacher(s) Created!')
-                setFields([{ name: "", email: "", phone: "", role: "", grade: "", section: "", subject: "" }])
+                setFields([{ name: "", email: "", phone: "", role: "", grade: "", section: "", subject: "", code: "" }])
                 return;
             }
             else{
@@ -221,10 +225,10 @@ const SuperStaff = () => {
     }
 
     return (
-        <div>
+        <div className='dash-div'>
             <h1>Add Staff</h1>
             <input type="file" accept='.xlsx' onChange={(e)=>setFile(e.target.files[0])}/>
-            <button onClick={handleUpload}>Upload using Excel Sheet</button>
+            <button style={{background: '#1f1f1f',color:'white'}} onClick={handleUpload}>Upload using Excel Sheet</button>
             <button type="button" onClick={addField}>+ Add Field</button>
             {gradeList.length > 0 && fields.map((field, index) => (
                 <Field

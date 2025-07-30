@@ -20,6 +20,7 @@ router.post('/getAssignments',StaffController.getAssignments)
 router.post('/getTimeline',StaffController.getTimeline)
 router.post('/getRemaining',StaffController.getRemaining)
 router.post('/assignMarks',StaffController.assignMarks)
+router.post('/loadStudentNames',StaffController.loadStudentNames)
 router.post('/loadGradeName',StaffController.loadGradeName)
 
 module.exports = router;

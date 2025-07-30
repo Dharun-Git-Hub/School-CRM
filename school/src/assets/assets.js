@@ -1,7 +1,9 @@
-import ODL from './ODL.jpg'
+import School from './School.jpg'
+import Garden from './Garden.webp'
 
 export const assets = {
-    ODL
+    School,
+    Garden
 }
 
 export default assets

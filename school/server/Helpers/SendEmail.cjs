@@ -28,14 +28,14 @@ const sendOTP = async(to) => {
     try{
         await transporter.sendMail(mailOptions);
     }
-    catch(err){
-        console.log(err)
-    }
+    catch(err){}
 }
 
 const validateOTP = (user,otp) => {
-    if(OTPSTORE[user]===otp)
+    if(OTPSTORE[user]===otp){
+        delete OTPSTORE[user]
         return true
+    }
     return false
 }
 

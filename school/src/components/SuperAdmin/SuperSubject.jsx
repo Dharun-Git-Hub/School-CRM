@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { encryptRandom } from '../../Security/Encryption'
+import '../styles/styles.css'
 
 const Field = ({gradeList,fieldIndex, fieldData, updateField, removeField, canRemove}) => {
     const [grades, setGrades] = useState(gradeList)
@@ -146,10 +147,10 @@ const SuperSubject = () => {
     }
 
     return (
-        <div>
+        <div className='dash-div'>
             <h1>Add Subject</h1>
             <input type="file" accept='.xlsx' onChange={(e)=>setFile(e.target.files[0])}/>
-            <button onClick={handleUpload}>Upload using Excel Sheet</button>
+            <button style={{background: '#1f1f1f',color:'white'}} onClick={handleUpload}>Upload using Excel Sheet</button>
             <button type="button" onClick={addField}>+ Add Field</button>
             {gradeList.length > 0 && fields.map((field, index) => (
                 <Field

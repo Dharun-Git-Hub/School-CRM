@@ -12,5 +12,7 @@ router.post('/validateToken',StudentController.validateToken)
 router.post('/getAssignments',StudentController.getAssignments)
 router.post('/submitMyAssignment',upload.single('file'),StudentController.submitMyAssignment)
 router.post('/getAttendancePercent',StudentController.getAttendancePercent)
+router.post('/getTimeline',StudentController.getTimeline)
+router.post('/getStaffEmail',StudentController.getStaffEmail)
 
 module.exports = router;

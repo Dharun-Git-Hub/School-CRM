@@ -1,12 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { ChatContext } from '../Context/ChatContext';
 
 const GradeAdminPanel = ({ socket, grade }) => {
     const [view, setView] = useState(null);
-    const [messages, setMessages] = useState({}); // { staffName: [ {from, text} ] }
+    const [messages, setMessages] = useState({});
     const [input, setInput] = useState('');
     const [staffList, setStaffList] = useState([]);
     const [selectedStaff, setSelectedStaff] = useState(null);
     const [namedStaff,setNamedStaff] = useState([])
+    const {notify} = useContext(ChatContext)
+    const inputRef = useRef(null)
+    
+        useEffect(()=>{
+            if(inputRef?.current){
+                inputRef?.current?.focus()
+            }
+        })
     
     useEffect(()=>{
         console.log(grade)
@@ -61,11 +70,13 @@ const GradeAdminPanel = ({ socket, grade }) => {
                     ...prev,
                     super: [...(prev.super || []), { from: "S.A.", text: data.message }]
                 }));
+                console.log('Sent')
+                notify(data.message,'Super Admin')
             } 
             else if(data.type === "public_message_from_grade"){
                 setMessages(prev => ({
                     ...prev,
-                    staffPublic: [...(prev.staffPublic || []), { from: "Grade Admins (Public)", text: data.message }]
+                    staffPublic: [...(prev.staffPublic || []), { from: "Grade Admin (Public)", text: data.message }]
                 }));
             } 
             else if(data.type === "private_message_from_staff"){
@@ -76,9 +87,11 @@ const GradeAdminPanel = ({ socket, grade }) => {
                     ...prev,
                     [staffName]: [...(prev[staffName] || []), { from: staffName, text: data.message }]
                 }));
+                notify(data.message,`Grade: ${grade}-${namedStaff.find(el => el.email === staffName)?.section}`)
             }
             else if(data.type === "private_message_from_grade"){
                 const staffName = data.to || selectedStaff;
+                
                 setMessages(prev => ({
                     ...prev,
                     [staffName]: [...(prev[staffName] || []), { from: "Me", text: data.message }]
@@ -99,14 +112,13 @@ const GradeAdminPanel = ({ socket, grade }) => {
 
     useEffect(()=>{
         if(view === 'staff' && socket && grade){
-            socket.send(JSON.stringify({ type: 'get_staff_list', grade }));
+            socket.send(JSON.stringify({type: 'get_staff_list',grade}));
         }
     },[view, socket, grade]);
 
-
-
     const handleSend = () => {
-        if (!input.trim()) return;
+        if(!input.trim())
+            return;
 
         if(view === 'super'){
             const msgPayload = {
@@ -149,7 +161,8 @@ const GradeAdminPanel = ({ socket, grade }) => {
         setInput('');
     };
     const handleKey = (e) => {
-        if (e.key === 'Enter') handleSend();
+        if(e.key === 'Enter')
+            handleSend();
     };
     const styles = {
         container: {
@@ -157,11 +170,12 @@ const GradeAdminPanel = ({ socket, grade }) => {
             display: 'flex',
             flexDirection: 'column',
             fontFamily: 'Arial, sans-serif',
-            position: 'absolute',
+            position: 'fixed',
             right: '2.5vw',
             bottom: '1vh',
             zIndex: 100,
             padding: '20px',
+            scrollBehaviour: 'smooth'
         },
         buttonRow: {
             display: 'flex',
@@ -188,7 +202,8 @@ const GradeAdminPanel = ({ socket, grade }) => {
             boxShadow: '0 0 2rem silver',
             overflow: 'hidden',
             padding: '20px',
-            animation: 'none'
+            animation: 'none',
+            scrollBehaviour: 'smooth'
         },
         chatLog: {
             flex: 1,
@@ -233,8 +248,8 @@ const GradeAdminPanel = ({ socket, grade }) => {
                     onClick={() => setView('super')}
                     style={{
                         ...styles.toggleButton,
-                        background: view === 'super' ? 'linear-gradient(to right,blue,#ff2976)' : '#e6e6e6',
-                        color: view === 'super' ? 'white' : 'black',
+                        background: view === 'super' ? 'linear-gradient(to right,blue,#ff2976)' : '#1f1f1f',
+                        color: 'white',
                     }}
                 >
                     Chat with Super Admin
@@ -245,10 +260,12 @@ const GradeAdminPanel = ({ socket, grade }) => {
                         ...styles.toggleButton,
                         background: view === 'staff' ? 'linear-gradient(to right,blue,#ff2976)' : '#e6e6e6',
                         color: view === 'staff' ? 'white' : 'black',
+                        border: '1px solid black'
                     }}
                 >
                     Chat with Staff
                 </button>
+                {view && <button onClick={()=>setView(null)} style={{cursor: 'pointer', position: 'fixed', left: '1vw', bottom: '5vh', width: '50px', height: '50px', borderRadius: '50%', border: 'none', background: '#1f1f1f', color: 'white'}}>Close</button>}
             </div>
 
             {view === 'super' && (
@@ -263,7 +280,7 @@ const GradeAdminPanel = ({ socket, grade }) => {
                                     backgroundColor: msg.from === 'Me' ? '#ffeaf9ff' : '#e1f5fe',
                                     padding: '8px 12px',
                                     borderRadius: '10px',
-                                    maxWidth: '100%',
+                                    maxWidth: '80%',
                                     boxShadow: '0 0 0.5rem rgba(0,0,0,0.1)',
                                     wordWrap: 'break-word',
                                 }}>
@@ -279,6 +296,7 @@ const GradeAdminPanel = ({ socket, grade }) => {
                             placeholder="Type your message..."
                             style={styles.input}
                             onKeyDown={handleKey}
+                            ref={inputRef}
                         />
                         <button onClick={handleSend} style={styles.sendButton}>Send</button>
                     </div>
@@ -314,19 +332,7 @@ const GradeAdminPanel = ({ socket, grade }) => {
                                 Grade {grade}-{namedStaff.find(el => el.email === name)?.section || name}
                             </li>
                         ))}
-                        <li
-                            style={{
-                                padding: '10px',
-                                cursor: 'pointer',
-                                background: !selectedStaff ? 'linear-gradient(to right,blue,#ff2976)' : '#fff',
-                                color: !selectedStaff ? 'white' : 'black',
-                                borderRadius: '5px',
-                                marginBottom: '5px',
-                            }}
-                            onClick={() => setSelectedStaff(null)}
-                        >
-                            All Staff (Public)
-                        </li>
+                        
                     </ul>
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'white', borderRadius: '0 1.5rem 1.5rem 0', boxShadow: '0 0 2rem silver', padding: '20px' }}>
                         <div style={styles.chatLog}>
@@ -356,6 +362,7 @@ const GradeAdminPanel = ({ socket, grade }) => {
                                 placeholder={selectedStaff ? `Message ${selectedStaff}...` : "Type your message..."}
                                 style={styles.input}
                                 onKeyDown={handleKey}
+                                ref={inputRef}
                             />
                             <button onClick={handleSend} style={styles.sendButton}>Send</button>
                         </div>

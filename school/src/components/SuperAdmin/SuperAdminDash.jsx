@@ -9,7 +9,6 @@ import SuperAdminPanel from '../../Chat/SuperAdminPanel'
 import '../styles/styles.css'
 
 const SuperAdminDash = ({socket}) => {
-    const [openChat,setOpenChat] = useState(false)
     const navigate = useNavigate()
     
     const handleReset = async() => {
@@ -40,21 +39,23 @@ const SuperAdminDash = ({socket}) => {
     }
 
     return (
-        <div>
-            Welcome, Super Admin!
-            <SuperSubject/>
-            <SuperGrade/>
-            <SuperStaff/>
-            <SuperAdminStudent/>
-            <SuperAddGradeAdmin/>
-            <button className='float-btn' style={{right: openChat && '95vw', background: openChat && 'black'}} onClick={()=>setOpenChat(prev=>!prev)}>{!openChat ? 'Chat' : 'Close'}</button>
-            {
-                openChat && 
-                <SuperAdminPanel socket={socket} />
-            }
-            <button onClick={()=>navigate('/super-logs')}>Logs</button>
-            <button onClick={handleReset}>Hard Reset</button>
-        </div>
+        <>
+            <div className='nav-note'>
+                <span className='welcome-note'>Welcome, Super Admin!</span>
+                <div>
+                    <button onClick={()=>navigate('/super-logs')}>Logs</button>
+                    <button style={{background: 'black', color: 'white'}} onClick={handleReset}>Hard Reset</button>
+                </div>
+            </div>
+            <div style={{display: 'flex'}}>
+                <SuperSubject/>
+                <SuperGrade/>
+                <SuperStaff/>
+                <SuperAdminStudent/>
+                <SuperAddGradeAdmin/>
+                {socket && <SuperAdminPanel socket={socket}/>}
+            </div>
+        </>
     )
 }
 

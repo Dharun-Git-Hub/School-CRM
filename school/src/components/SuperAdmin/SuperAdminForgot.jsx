@@ -17,8 +17,10 @@ const SuperAdminForgot = () => {
                 })
                 const data = await response.json()
                 console.log(data)
-                if(data.status==='success')
+                if(data.status==='success'){
+                    alert('A Link is sent to your email. Please go there and follow the steps')
                     navigate('/login-super')
+                }
                 else{
                     alert(data.message)
                     return
@@ -33,9 +35,14 @@ const SuperAdminForgot = () => {
             return
         }
     }
+    const handleKey = (e) => {
+        if(e.key === 'Enter'){
+            sendLink()
+        }
+    }
     return (
-        <div>
-            <input type="email" placeholder='Enter your registered Email' onChange={(e)=>setEmail(e.target.value)}/>
+        <div className='forgot-cont'>
+            <input type="email" placeholder='Enter your registered Email' onChange={(e)=>setEmail(e.target.value)} onKeyDown={(e)=>handleKey(e)}/>
             <button onClick={sendLink}>Send Link</button>
         </div>
     )

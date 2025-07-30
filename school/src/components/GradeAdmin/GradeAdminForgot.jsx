@@ -34,7 +34,7 @@ const SuperAdminForgot = () => {
         }
     }
     return (
-        <div>
+        <div className='forgot-cont'>
             <input type="email" placeholder='Enter your registered Email' onChange={(e)=>setEmail(e.target.value)}/>
             <button onClick={sendLink}>Send Link</button>
         </div>

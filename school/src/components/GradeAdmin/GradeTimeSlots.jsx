@@ -1,29 +1,27 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect, useContext } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { ChatContext } from '../../Context/ChatContext'
+import GradeAdminPanel from '../../Chat/GradeAdminPanel'
 
 const GradeTimeSlots = () => {
-    const [gradeList,setGradeList] = useState([])
+    const location = useLocation()
+    const myGrade = location.state || ''
+    console.log(myGrade)
     const [sectionList,setSections] = useState([])
     const [navData,setNavData] = useState({})
     const [gradeId,setGradeId] = useState('')
     const [sectionId,setSectionId] = useState('')
     const [academicYear,setAcademicYear] = useState('')
     const navigate = useNavigate()
+    const {socketConn} = useContext(ChatContext)
 
     useEffect(()=>{
-        const getGrade = async () => {
-            const response = await fetch('http://localhost:3000/grade/getGrades')
-            const data = await response.json();
-            console.log(data)
-            if(data.status==='success'){
-                setGradeList(data.list)
-            }
-            else{
-                alert(data.message)
-            }
-        }
         const getSection = async () => {
-            const response = await fetch('http://localhost:3000/grade/getSections')
+            const response = await fetch('http://localhost:3000/grade/getSections',{
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({details:myGrade})
+            })
             const data = await response.json();
             console.log(data)
             if(data.status==='success'){
@@ -33,26 +31,21 @@ const GradeTimeSlots = () => {
                 alert(data.message)
             }
         }
-        getGrade()
         getSection()
     },[])
 
     useEffect(()=>{
         setNavData({
-            gradeId,
+            myGrade,
             sectionId,
             academicYear,
         })
-    },[gradeId,sectionId,academicYear])
+        console.log(navData)
+    },[myGrade,sectionId,academicYear])
 
     const goToScheduler = () => {
-        const exists = gradeList.some(el=>el===gradeId)
-        if(!exists){
-            alert('Please select a valid Grade from the list!')
-            return
-        }
         for(const el of sectionList){
-            const exists = sectionList.filter(e=>e.grade === gradeId)
+            const exists = sectionList.filter(e=>e.grade === myGrade)
             console.log(exists)
             const proceed = exists.some(e=>sectionId === e.name)
             if(!proceed){
@@ -60,7 +53,7 @@ const GradeTimeSlots = () => {
                 return
             }
         }
-        if(gradeId.trim() !== '' && sectionId.trim() !== '' && academicYear){
+        if(myGrade.trim() !== '' && sectionId.trim() !== '' && academicYear){
             navigate('/timetable',{state: navData})
         }
         else{
@@ -70,27 +63,19 @@ const GradeTimeSlots = () => {
     }
 
     return (
-        <div>
-            <input placeholder='Grade' list="grade-list" onChange={e=>setGradeId(e.target.value)}/>
-            <datalist id="grade-list">
-                {
-                    gradeList.map((el,index)=>(
-                        <option key={index} value={el}>{el}</option>
-                    ))
-                }
-            </datalist>
+        <div className='slots-cont'>
+            <input placeholder='Grade' list="grade-list" value={myGrade} disabled/>
             <input placeholder='Section' list="list-sections" value={sectionId} onChange={e=>setSectionId(e.target.value)}/>
             <datalist id="list-sections">
                 {
-                    sectionList
-                        .filter(el => el.grade === gradeId)
-                        .map((el, index) => (
+                    sectionList.map((el, index) => (
                             <option key={index} value={el.name}>{el.name}</option>
                         ))
                 }
             </datalist>
             <input type='date' placeholder='Academic Year' onChange={e=>setAcademicYear(e.target.value)}/>
             <button onClick={goToScheduler}>Schedule Timetable</button>
+            {socketConn && myGrade.trim() !== '' && <GradeAdminPanel socket={socketConn} grade={myGrade}/>}
         </div>
     )
 }

@@ -176,12 +176,13 @@ exports.markAttendance = async (req,res) => {
 exports.getAttendance = async (req,res) => {
     const {details} = req.body;
     const decrypted = JSON.parse(decryptRandom(details))
-    const {section,grade,year,month,day,name} = decrypted
+    const {section,grade,year,month,name} = decrypted
     try{
         const exists = await TeacherModel.exists({name:name,section:section,grade:grade})
         if(!exists)
             return res.json({status:"failure",message:"Unauthorized Access!"})
-        const result = await Attendance.findOne({section,grade,year,month,day})
+        const result = await Attendance.find({section,grade,year,month})
+        console.log('Attendance', result)
         return res.json({status:"success",list:encryptRandom(JSON.stringify(result))})
     }
     catch(err){
@@ -258,6 +259,7 @@ exports.deleteAssignment =async (req,res) => {
 exports.getMyGrades = async(req,res) => {
     const {details} = req.body;
     const {staffName,staffGrade} = JSON.parse(decryptRandom(details))
+    console.log(JSON.parse(decryptRandom(details)))
     try{
         const pipeline = [
             {
@@ -266,9 +268,11 @@ exports.getMyGrades = async(req,res) => {
                 }
             },
             {
-                $match: { $and:
-                    [{"timeslots.teacher":staffName},
-                    {"gradeID":staffGrade}]
+                $match: { 
+                    $and: [
+                        {"timeslots.teacher":staffName},
+                        {"gradeID":staffGrade}
+                    ]
                 } 
             },
             {
@@ -292,6 +296,7 @@ exports.getMyGrades = async(req,res) => {
             },
         ]
         const result = await Timetable.aggregate(pipeline)
+        console.log('Result: ',result)
         const sections = result.reduce((acc,c)=>{
             acc.push(c.sections)
             return acc;
@@ -376,12 +381,30 @@ exports.assignMarks = async (req,res) => {
     }
 }
 
+exports.loadStudentNames = async (req,res) => {
+    const {details} = req.body;
+    console.log('My Details: ',details)
+    try{
+        const result = await Student.find({grade:details.grade,section:details.section})
+        const list = []
+        for(let i of result){
+            list.push({email:i.email,roll:i.roll})
+        }
+        return res.json({status:'success',list})
+    }
+    catch(err){
+        console.log(err)
+        return res.json({status:"failure",message:"Something went wrong!"})
+    }
+}
+
 exports.loadGradeName = async (req,res) => {
     const {details} = req.body;
     try{
+        console.log('This Details: ',details)
         const result = await GradeAdmin.findOne({grade:details.gradeFromLogin})
         console.log(result)
-        return res.json({status:"success",list:result.email})
+        return res.json({status:"success",list:result?.email})
     }
     catch(err){
         console.log(err)

@@ -131,7 +131,7 @@ exports.uploadExcel = async (req,res) => {
                 catch(err){}
             }
         })
-        const data = []
+        let data = []
         worksheet.map((el)=>{
             const {Name,Code} = el;
             const grades = [myGrade]
@@ -143,12 +143,21 @@ exports.uploadExcel = async (req,res) => {
             data.push(temp)
         })
         console.log(data)
-        for(const e of data){
-            const exists = await Subject.exists({code:e.code})
+        for(let i of data){
+            const exists = await Subject.findOne({name: i.name, code: i.code})
+            console.log(exists)
+            console.log(i)
             if(exists){
-                return res.json({status:"failure",message:"Subject with this Subject code already found!"})
+                if(exists.grade.includes(i.grade[0])){
+                    return res.json({status:"failure",message:'Subject(s) already found!'})
+                }
+                else{
+                    await Subject.updateOne({name: exists.name, code: exists.code},{$push: {grade:i.grade[0]}})
+                    data = data.filter(el=>el.code !== i.code)
+                }
             }
         }
+        console.log('After Filter',data)
         try{
             await Subject.insertMany(data)
             await Logs.insertOne({action:`Grade Admin of Grade: ${myGrade} created some subjects with excel file at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${myGrade}`,to:["Super"]})
@@ -169,7 +178,7 @@ exports.uploadManual = async (req,res) => {
     const decrypted = JSON.parse(decryptRandom(details)).fields
     const myGrade = JSON.parse(decryptRandom(details)).myGrade
     console.log(myGrade)
-    const data = []
+    let data = []
     decrypted.map((el)=>{
         const {subjectName, subjectCode, selected} = el
         let temp = {
@@ -180,12 +189,21 @@ exports.uploadManual = async (req,res) => {
         console.log(temp)
         data.push(temp)
     })
-    for(const e of data){
-        const exists = await Subject.exists({code:e.code})
+    for(let i of data){
+        const exists = await Subject.findOne({name: i.name, code: i.code})
+        console.log(exists)
+        console.log(i)
         if(exists){
-            return res.json({status:"failure",message:"Subject with this Subject code already found!"})
+            if(exists.grade.includes(i.grade[0])){
+                return res.json({status:"failure",message:'Subject(s) already found!'})
+            }
+            else{
+                await Subject.updateOne({name: exists.name, code: exists.code},{$push: {grade:i.grade[0]}})
+                data = data.filter(el=>el.code !== i.code)
+            }
         }
     }
+    console.log('After Filter',data)
     try{
         await Subject.insertMany(data)
         await Logs.insertOne({action:`Grade Admin of Grade: ${myGrade} created some subjects manually at ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,who:`Grade Admin of Grade: ${myGrade}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super"]})
@@ -238,7 +256,7 @@ exports.addTeacherManually = async (req,res) => {
     console.log(decrypted)
     const myGrade = JSON.parse(decryptRandom(details)).myGrade
     for(const el of decrypted){
-        const exists = await Subject.findOne({name: el.subject})
+        const exists = await Subject.findOne({name: el.subject,code: el.code})
         if(!exists){
             return res.json({status:"failure",message:`Subject ${el.subject} not found!`});
         }
@@ -254,6 +272,7 @@ exports.addTeacherManually = async (req,res) => {
             grade: el.grade,
             section: el.section,
             subject: el.subject,
+            code: el.code,
         });
         const foundMaster = await Teacher.exists({grade: el.grade, section: el.section})
         if(exists || foundMaster){
@@ -285,9 +304,9 @@ exports.addTeacherByExcel = async (req,res) => {
         const worksheet = xlsx.utils.sheet_to_json(workbook.Sheets[sheet]);
         console.log(worksheet)
         worksheet.map((el)=>{
-            if(!el.hasOwnProperty("Name") || !el.hasOwnProperty("Email") || !el.hasOwnProperty("Phone") || !el.hasOwnProperty("Role") || !el.hasOwnProperty("Grade") || !el.hasOwnProperty("Section") || !el.hasOwnProperty("Subject")){
+            if(!el.hasOwnProperty("Name") || !el.hasOwnProperty("Email") || !el.hasOwnProperty("Phone") || !el.hasOwnProperty("Role") || !el.hasOwnProperty("Grade") || !el.hasOwnProperty("Section") || !el.hasOwnProperty("Subject") || !el.hasOwnProperty("Code")){
                 try{
-                    return res.json({status:"failure",message:`Excel sheet should contain [Name, Email, Phone, Role, Grade, Section and Subject] Properties!`})
+                    return res.json({status:"failure",message:`Excel sheet should contain [Name, Email, Phone, Role, Grade, Section, Subject, Code] Properties!`})
                 }
                 catch(err){}
             }
@@ -330,7 +349,7 @@ exports.addTeacherByExcel = async (req,res) => {
         })
         const data = [];
         worksheet.forEach((el)=>{
-            const { Name, Email, Phone, Role, Grade, Section, Subject } = el;
+            const { Name, Email, Phone, Role, Grade, Section, Subject, Code } = el;
             let temp = {
                 name: Name,
                 email: Email,
@@ -339,6 +358,7 @@ exports.addTeacherByExcel = async (req,res) => {
                 grade: Grade,
                 section: Section,
                 subject: Subject,
+                code: Code,
                 password: "STAFF"
             };
             data.push(temp);
@@ -351,6 +371,7 @@ exports.addTeacherByExcel = async (req,res) => {
                 grade: el.grade,
                 section: el.section,
                 subject: el.subject,
+                code: el.code,
             });
             const foundMaster = await Teacher.exists({grade: el.grade, section: el.section})
             if(exists || foundMaster){
@@ -359,7 +380,7 @@ exports.addTeacherByExcel = async (req,res) => {
         }
         try{
             for(const el of data){
-                const exists = await Subject.findOne({name: el.subject})
+                const exists = await Subject.findOne({name: el.subject, code: el.code})
                 if(!exists){
                     return res.json({status:"failure",message:`Subject ${el.subject} not found!`});
                 }
@@ -419,7 +440,7 @@ exports.addStudentManually = async (req,res) => {
             if(exists) return res.json({status:"failure", message: "Student Already found!"})
         }
         for(const el of modified){
-            const exists = await Student.exists({roll: el.roll})
+            const exists = await Student.exists({grade: el.grade, section: el.section, roll: el.roll})
             console.log(exists)
             if(exists) return res.json({status:"failure", message: "Same Roll Number already found!"})
         }
@@ -536,24 +557,24 @@ exports.addStudentByExcel = async (req,res) => {
         }
         for(const el of data){
             const exists = await Student.findOne({
-                admission_no: el.admission_no, email: el.email
+                $or: [
+                    {admission_no: el.admission_no},
+                    {email: el.email}
+                ]
             });
             if(exists){
+                console.log('1st One')
                 return res.json({status:"failure",message:`Student already found!`});
             }
         }
         for(const el of data){
             const exists = await Student.findOne({
-                name: el.name, roll: el.roll
+                name: el.name, grade: el.grade, roll: el.roll, section: el.section
             });
             if(exists){
+                console.log('2nd execution')
                 return res.json({status:"failure",message:`Student already found!`});
             }
-        }
-        for(const el of data){
-            const exists = await Student.exists({roll: el.roll})
-            console.log(exists)
-            if(exists) return res.json({status:"failure", message: "Same Roll Number(s) already found!"})
         }
         try{
             await Student.insertMany(data);
@@ -690,18 +711,11 @@ exports.uploadSectionByExcel = async (req,res) => {
 }
 
 exports.getSections = async (req,res) => {
+    const {details} = req.body
+    console.log('My Grade Input: ',details)
     try{
-        const pipeline = [
-            {
-                $project: {
-                    _id: 0,
-                    name: 1,
-                    grade: 1,
-                }
-            }
-        ]
-        const list = await Section.aggregate(pipeline)
-        console.log('Sections',list)
+        const list = await Section.find({grade:details})
+        console.log('Section List: ',list)
         return res.json({status:"success",list:list})
     }
     catch(err){

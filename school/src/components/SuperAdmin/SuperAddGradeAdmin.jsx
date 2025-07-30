@@ -67,7 +67,7 @@ const SuperAddGradeAdmin = () => {
     }
 
     return (
-        <div>
+        <div className='dash-div'>
             <h1>Add Grade Admin</h1>
             <form onSubmit={handleSubmit}>
                 <input type="email" placeholder='Email' value={email} onChange={e=>setEmail(e.target.value)} required/>
@@ -80,7 +80,7 @@ const SuperAddGradeAdmin = () => {
                     }
                 </datalist>
                 <input placeholder='Grade' list='grade-list' onChange={e=>setGrade(e.target.value)}/>
-                <button type="submit">Create Grade Admin</button>
+                <button style={{background: '#1f1f1f',color:'white'}} type="submit">Create Grade Admin</button>
             </form>
         </div>
     )

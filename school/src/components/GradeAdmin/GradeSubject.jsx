@@ -147,7 +147,7 @@ const GradeSubject = ({myGrade}) => {
     }
 
     return (
-        <div>
+        <div className='dash-div'>
             <h1>Add Subject</h1>
             <input type="file" accept='.xlsx' onChange={(e)=>setFile(e.target.files[0])}/>
             <button onClick={handleUpload}>Upload using Excel Sheet</button>

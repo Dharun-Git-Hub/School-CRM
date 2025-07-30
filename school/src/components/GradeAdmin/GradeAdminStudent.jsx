@@ -48,9 +48,11 @@ const Fields = ({fieldIndex,fieldData,updateField,removeField,gradeList,sectionL
             <input placeholder='Name' value={name} onChange={e=>setName(e.target.value)}/>
             <input placeholder='Roll' value={roll} onChange={e=>setRoll(e.target.value)}/>
             <input placeholder='Admission Number' value={adno} onChange={e=>setAdno(e.target.value)}/>
-            <input placeholder='DOB' type="date" value={dob} onChange={e=>setDob(e.target.value)} min={"2000-11-30"} max={"2004-11-30"}/>
-            Male{" "}<input type="radio" name="forgender" value={"Male"} onChange={e=>setGender(e.target.value)}/>
-            Female{" "}<input type="radio" name="forgender" value={"Female"} onChange={e=>setGender(e.target.value)}/>
+            <div style={{display: 'flex',alignItems:'center', marginLeft:'10px',fontFamily:'Poppins',fontSize:'0.8rem'}}>Date Of Birth
+                <input placeholder='DOB' type="date" value={dob} onChange={e=>setDob(e.target.value)} min={"2000-11-30"} max={"2004-11-30"}/>
+            </div>
+            <span style={{fontFamily: 'Poppins',fontSize: '0.8rem',marginLeft:'10px'}}>Male</span><input style={{cursor:'pointer'}} type="radio" name="forgender" value={"Male"} onChange={e=>setGender(e.target.value)}/>
+            <span style={{fontFamily: 'Poppins',fontSize: '0.8rem',marginLeft:'10px'}}>Female</span><input style={{cursor:'pointer'}} type="radio" name="forgender" value={"Female"} onChange={e=>setGender(e.target.value)}/>
             <input placeholder='Grade' list="list-grades" value={grade} onChange={e=>setGrade(e.target.value)}/>
             <datalist id="list-grades">
                 {
@@ -70,7 +72,9 @@ const Fields = ({fieldIndex,fieldData,updateField,removeField,gradeList,sectionL
                         ))
                 }
             </datalist>
-            <input type="date" placeholder='Current Academic Year' value={acyear} onChange={e=>setAcyear(e.target.value)}/>
+            <div style={{display: 'flex',alignItems:'center', marginLeft:'10px',fontFamily:'Poppins',fontSize:'0.8rem'}}>Academic Year
+                <input type="date" placeholder='Current Academic Year' value={acyear} onChange={e=>setAcyear(e.target.value)}/>
+            </div>
             <textarea placeholder='Address' value={address} onChange={e=>setAddress(e.target.value)}/>
             {canRemove && <button type="button" onClick={() => removeField(fieldIndex)}>- Remove Field</button>}
         </div>
@@ -118,8 +122,14 @@ const GradeAdminStudent = ({myGrade}) => {
                 console.log(err)
             }
             try{
-                const response = await fetch('http://localhost:3000/grade/getSections');
+                console.log(myGrade)
+                const response = await fetch('http://localhost:3000/grade/getSections',{
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({details:myGrade})
+                });
                 const data = await response.json()
+                console.log(data)
                 if(data.status === 'success'){
                     console.log(data.list)
                     setSections(data.list)
@@ -215,7 +225,7 @@ const GradeAdminStudent = ({myGrade}) => {
     }
 
     return (
-        <div>
+        <div className='dash-div'>
             <h1>Add Student</h1>
             <input type="file" accept='.xlsx' onChange={e=>setFile(e.target.files[0])}/>
             <button onClick={handleUpload}>Upload using Excel</button>

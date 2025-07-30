@@ -3,12 +3,18 @@ import GradeSubject from './GradeSubject'
 import GradeAdminStudent from './GradeAdminStudent'
 import GradeSection from './GradeSection'
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import GradeAdminPanel from '../../Chat/GradeAdminPanel'
+import { ChatContext } from '../../Context/ChatContext'
 
 const GradeAdminDash = ({socket}) => {
     const navigate = useNavigate()
     const [myGrade,setMyGrade] = useState('')
+    const {setSocketConn} = useContext(ChatContext)
+
+    useEffect(()=>{
+        setSocketConn(socket)
+    },[myGrade])
 
     useEffect(()=>{
         const fetchGrade = async () => {
@@ -35,14 +41,24 @@ const GradeAdminDash = ({socket}) => {
 
     return (
         <div>
-            Welcome, Grade Admin!
-            <GradeStaff myGrade={myGrade}/>
-            <GradeSubject myGrade={myGrade}/>
-            <GradeAdminStudent myGrade={myGrade}/>
-            <GradeSection myGrade={myGrade}/>
-            {myGrade.trim() !== '' && <GradeAdminPanel socket={socket} grade={myGrade}/>}
-            <button onClick={()=>navigate('/grade-logs')}>Logs</button>
-            <button onClick={()=>navigate('/grade-timeslots')}>Timeslots</button>
+            <div className='nav-note'>
+                <span className='welcome-note'>Welcome, Grade Admin!</span>
+                <div>
+                    <button onClick={()=>navigate('/grade-logs',{state:myGrade})}>Logs</button>
+                    <button style={{background: '#1f1f1f',color:'white'}} onClick={()=>navigate('/grade-timeslots',{state:myGrade})}>Timeslots</button>
+                </div>
+            </div>
+            <div style={{display: 'flex'}}>
+                { myGrade.trim() !== '' &&
+                    <>
+                        <GradeStaff myGrade={myGrade}/>
+                        <GradeSubject myGrade={myGrade}/>
+                        <GradeAdminStudent myGrade={myGrade}/>
+                        <GradeSection myGrade={myGrade}/>
+                    </>
+                }
+                {socket && myGrade.trim() !== '' && <GradeAdminPanel socket={socket} grade={myGrade}/>}
+            </div>
         </div>
     )
 }

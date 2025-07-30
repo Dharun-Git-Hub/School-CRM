@@ -23,9 +23,9 @@ const showAll = () => {
 const sendGradeAdminsNameToSuper = () => {
     const gradeAdmins = rooms.get('superRoom').people;
     let gradeAdminsName = [];
-    for (let i of gradeAdmins) {
-        if (i.hasOwnProperty('grade')) {
-            for (let name of i["grade"]) {
+    for(let i of gradeAdmins) {
+        if(i.hasOwnProperty('grade')){
+            for(let name of i["grade"]){
                 gradeAdminsName.push(namedClients.get(name));
             }
         }
@@ -36,9 +36,9 @@ const sendGradeAdminsNameToSuper = () => {
 const sendStaffNamesToGradeAdmin = (grade) => {
     const staff = rooms.get(`gradeRoom_${grade}`).people;
     let staffNames = [];
-    for (let i of staff) {
-        if (i.hasOwnProperty('staff')) {
-            for (let name of i["staff"]) {
+    for(let i of staff){
+        if(i.hasOwnProperty('staff')){
+            for(let name of i["staff"]){
                 staffNames.push(namedClients.get(name));
             }
         }
@@ -46,41 +46,19 @@ const sendStaffNamesToGradeAdmin = (grade) => {
     return staffNames;
 };
 
-
-const sendGradeAdminNameToStaff = (grade) => {
-    const gradeRoom = rooms.get(`gradeRoom_${grade}`).people;
-    for (let i of gradeRoom) {
-        if (i.hasOwnProperty('gradeAdmin')) {
-            return namedClients.get(i["gradeAdmin"]);
-        }
-    }
-    return null;
-};
-
-
-const sendStaffNameToStudent = (grade, section) => {
-    const room = rooms.get(`studentRoom_${grade}_${section}`).people;
-    for (let i of room) {
-        if (i.hasOwnProperty('staff')) {
-            return namedClients.get(i["staff"]);
-        }
-    }
-    return null;
-};
-
-
-const sendStudentsNameToStaff = (grade, section) => {
-    const studentRoom = rooms.get(`studentRoom_${grade}_${section}`).people;
+const sendStudentsNameToStaff = (grade,section) => {
+    const student = rooms.get(`studentRoom_${grade}_${section}`).people
     let studentNames = [];
-    for (let i of studentRoom) {
-        if (i.hasOwnProperty("students")) {
-            for (let name of i['students']) {
+    for(let i of student){
+        if(i.hasOwnProperty('students')){
+            for(let name of i['students']){
                 studentNames.push(namedClients.get(name));
             }
         }
     }
+    console.log(`The Students of ${grade} - ${section} is : ${studentNames}`)
     return studentNames;
-};
+}
 
 // ______________________________________________________________________________________________
 
@@ -252,6 +230,19 @@ wss.on('connection',(ws)=>{
                 console.log(`Student with ID: ${userId} has joined Staff-Student Room`)
                 console.log('Staff - Student Room: ')
                 console.log(rooms.get(`studentRoom_${myGrade}_${mySection}`).people)
+                const studentsNames = sendStudentsNameToStaff(myGrade,mySection);
+                for(let i of rooms.get(`studentRoom_${myGrade}_${mySection}`).people){
+                    if(i.hasOwnProperty('staff')){
+                        for(let [conn,ids] of clients.entries()){
+                            if(ids===i['staff']){
+                                conn.send(enc({
+                                    type: 'students_list',
+                                    list: studentsNames
+                                }))
+                            }
+                        }
+                    }
+                }
             }
         }
         else if(data.type==='public_msg_to_gradeAdmins'){
@@ -300,6 +291,7 @@ wss.on('connection',(ws)=>{
             const myGrade = data.grade;
             const mySection = data.section;
             const studentName = data.toName;
+            console.log(`Staff of Grade : ${myGrade} - ${mySection} has send a message to ${studentName}`)
             let toId;
             for(let [id,name] of namedClients.entries()){
                 if(name===studentName){
@@ -381,7 +373,7 @@ wss.on('connection',(ws)=>{
         else if(data.type === 'get_students_list'){
             const {grade, section} = data;
             const students = sendStudentsNameToStaff(grade, section);
-            ws.send(JSON.stringify({
+            ws.send(enc({
                 type: 'students_list',
                 list: students
             }));
@@ -389,30 +381,60 @@ wss.on('connection',(ws)=>{
         else if(data.type==='private_msg_to_staff'){
             const auth = data.auth;
             const myGrade = data.grade;
+            const mySection = data.section;
             const staffName = data.to;
             let toId;
-            if (rooms.has(`gradeRoom_${myGrade}`)) {
-                for (let i of rooms.get(`gradeRoom_${myGrade}`).people) {
-                    if (i.hasOwnProperty('staff')) {
-                        for (let id of i['staff']) {
-                            if (namedClients.get(id) === staffName) {
-                                toId = id;
-                                break;
+            console.log(data)
+            if(auth==='grade'){
+                if(rooms.has(`gradeRoom_${myGrade}`)){
+                    for(let i of rooms.get(`gradeRoom_${myGrade}`).people){
+                        if(i.hasOwnProperty('staff')){
+                            for(let id of i['staff']){
+                                if(namedClients.get(id)===staffName){
+                                    toId = id;
+                                    break;
+                                }
                             }
                         }
                     }
                 }
-            }
-            if(toId){
-                for(let [conn,ids] of clients.entries()){
-                    if(ids === toId){
-                        let fromName = null;
-                        for(let [id,name] of namedClients.entries()){
-                            if(id===clients.get(ws))
-                                fromName = name;
+                if(toId){
+                    for(let [conn,ids] of clients.entries()){
+                        if(ids === toId){
+                            let fromName = null;
+                            for(let [id,name] of namedClients.entries()){
+                                if(id===clients.get(ws))
+                                    fromName = name;
+                            }
+                            conn.send(enc({type:'private_message_from_grade', message: msg, from: fromName }));
+                            break;
                         }
-                        conn.send(enc({type:'private_message_from_grade', message: msg, from: fromName }));
-                        break;
+                    }
+                }
+            }
+            else if(auth==='student'){
+                if(rooms.has(`studentRoom_${myGrade}_${mySection}`)){
+                    for(let i of rooms.get(`studentRoom_${myGrade}_${mySection}`).people){
+                        if(i.hasOwnProperty('staff')){
+                            console.log(i['staff'])
+                            for(let [ids,names] of namedClients.entries()){
+                                if(ids===i['staff']){
+                                    toId=names
+                                }
+                            }
+                        }
+                    }
+                }
+                console.log('TOID: ',toId)
+                if(toId){
+                    for(let [ids,names] of namedClients.entries()){
+                        if(names===toId){
+                            for(let [conn,id] of clients.entries()){
+                                if(id===ids){
+                                    conn.send(enc({type:'private_message_from_student', message: msg, from: namedClients.get(userId) }));
+                                }
+                            }
+                        }
                     }
                 }
             }

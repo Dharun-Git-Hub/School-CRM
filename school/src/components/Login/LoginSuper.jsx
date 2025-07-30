@@ -78,9 +78,14 @@ const LoginSuper = () => {
                 navigate('/super-admin-dash')
             }
         }
+        const handleKey = (e) => {
+            if(e.key==='Enter'){
+                handleSubmitOTP()
+            }
+        }
         return (
             <div style={styles.division}>
-                <input style={styles.input} type='number' placeholder='OTP' onChange={(e)=>setOTP(e.target.value)}/>
+                <input style={styles.input} type='number' placeholder='OTP' onChange={(e)=>setOTP(e.target.value)} onKeyDown={(e)=>handleKey(e)}/>
                 <button style={{width: 'fit-content', fontSize: '0.7rem', backgroundColor: '#1f1f1f', color: '#ddd'}} onClick={handleSubmitOTP}>Submit</button>
             </div>
         )

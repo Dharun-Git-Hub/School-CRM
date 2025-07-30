@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import './styles.css'
+import { ChatContext } from '../Context/ChatContext';
 
 const SuperAdminPanel = ({socket}) => {
     const [gradeAdmins, setGradeAdmins] = useState([]);
@@ -7,8 +8,17 @@ const SuperAdminPanel = ({socket}) => {
     const [messages, setMessages] = useState({});
     const [input, setInput] = useState('');
     const [mapped,setMapped] = useState([])
+    const [openChat,setOpenChat] = useState(false)
     const gradeToEmailMap = Object.fromEntries(mapped.map(item => [item.grade, item.email]));
     const emailToGradeMap = Object.fromEntries(mapped.map(item => [item.email, item.grade]));
+    const inputRef = useRef(null)
+    const {notify} = useContext(ChatContext)
+    
+        useEffect(()=>{
+            if(inputRef?.current){
+                inputRef?.current?.focus()
+            }
+        })
 
     useEffect(()=>{
         const fetchList = async () => {
@@ -66,6 +76,7 @@ const SuperAdminPanel = ({socket}) => {
                     ...prev,
                     [grade]: [...(prev[grade] || []), newMessage]
                 }));
+                notify(data.message,`Grade ${grade} Admin`)
             }
         };
         socket.addEventListener('message', handleMessage);
@@ -100,7 +111,7 @@ const SuperAdminPanel = ({socket}) => {
             display: 'flex',
             height: '100vh',
             fontFamily: 'Arial, sans-serif',
-            position: 'absolute',
+            position: 'fixed',
             right: '1vw',
             bottom: '1vh',
             flexDirection: 'row-reverse',
@@ -192,58 +203,67 @@ const SuperAdminPanel = ({socket}) => {
     }
 
     return (
-        <div style={styles.container}>
-            <ul style={styles.list}>
-                {gradeAdmins.map((name, index) => {
-                    const grade = emailToGradeMap[name];
-                    const lastMessage = messages[grade]?.slice(-1)[0]?.message;
+        <>
+            {
+                !openChat ?
+                    <button className='float-btn' style={{zIndex: '200',position: 'fixed',left: openChat && '95vw', background: openChat && 'black'}} onClick={()=>setOpenChat(prev=>!prev)}>{!openChat ? <i className='bx bx-chat' style={{transform: 'translateY(3px)',fontSize: '1.5rem'}}></i> : 'Close'}</button>
+                    :
+                <div style={styles.container}>
+                    <button className='float-btn-close' style={{zIndex: '200',position: 'fixed',right: openChat && '95vw', background: openChat && 'black'}} onClick={()=>setOpenChat(prev=>!prev)}>{!openChat ? 'Chat' : <i className='bx bx-arrow-back' style={{transform: 'translateY(3px)',fontSize: '1.5rem'}}></i>}</button>
+                    <ul style={styles.list}>
+                        {gradeAdmins.map((name, index) => {
+                            return (
+                            <li
+                                key={index}
+                                style={{
+                                ...styles.listItem,
+                                background: selectedAdmin === name ? 'linear-gradient(to right,blue,#ff2976)' : '#fff',
+                                color: selectedAdmin === name ? 'white' : 'black',
+                                flexDirection: 'column',
+                                alignItems: 'flex-start',
+                                }}
+                                onClick={() => setSelectedAdmin(name)}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <div style={styles.avatar}>{name.charAt(0).toUpperCase()}</div>
+                                <span>Grade Admin {emailToGradeMap[name]}</span>
+                                </div>
+                            </li>
+                            );
+                        })}
+                        </ul>
 
-                    return (
-                    <li
-                        key={index}
-                        style={{
-                        ...styles.listItem,
-                        background: selectedAdmin === name ? 'linear-gradient(to right,blue,#ff2976)' : '#fff',
-                        color: selectedAdmin === name ? 'white' : 'black',
-                        flexDirection: 'column',
-                        alignItems: 'flex-start',
-                        }}
-                        onClick={() => setSelectedAdmin(name)}
-                    >
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <div style={styles.avatar}>{name.charAt(0).toUpperCase()}</div>
-                        <span>Grade Admin {emailToGradeMap[name]}</span>
-                        </div>
-                    </li>
-                    );
-                })}
-                </ul>
 
-
-            {selectedAdmin && (
-                <div className='list-grade' style={styles.chatBox}>
-                    <h3 style={{color:"grey"}}>{selectedAdmin}</h3>
-                    <div style={styles.messageArea}>
-                        {(messages[emailToGradeMap[selectedAdmin]] || []).map((msg, idx) => (
-                            <div key={idx} style={{...styles.messageItem,backgroundColor: msg.from === 'You' ? '#f7eefeff' : '#e1f5fe'}}>
-                                <strong>{msg.from}:</strong> {msg.message}
+                    {selectedAdmin && (
+                        <div className='list-grade' style={styles.chatBox}>
+                            <h3 style={{color:"grey"}}>{selectedAdmin}</h3>
+                            <div style={styles.messageArea}>
+                                {(messages[emailToGradeMap[selectedAdmin]] || []).map((msg, idx) => (
+                                    <div key={idx} style={{...styles.messageItem,
+                                    backgroundColor: msg.from === 'You' ? '#f7eefeff' : '#e1f5fe',
+                                    position: 'relative',
+                                    }}>
+                                        <strong>{msg.from}:</strong> {msg.message}
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
-                    <div style={styles.inputArea}>
-                        <input
-                            type="text"
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            style={styles.input}
-                            placeholder="Type your message..."
-                            onKeyDown={(e)=>handleKey(e)}
-                        />
-                        <button onClick={handleSendMessage} style={styles.sendButton}>Send</button>
-                    </div>
+                            <div style={styles.inputArea}>
+                                <input
+                                    type="text"
+                                    value={input}
+                                    onChange={(e) => setInput(e.target.value)}
+                                    style={styles.input}
+                                    placeholder="Type your message..."
+                                    onKeyDown={(e)=>handleKey(e)}
+                                    ref={inputRef}
+                                />
+                                <button onClick={handleSendMessage} style={styles.sendButton}>Send</button>
+                            </div>
+                        </div>
+                    )}
                 </div>
-            )}
-        </div>
+            }
+        </>
     );
 };
 

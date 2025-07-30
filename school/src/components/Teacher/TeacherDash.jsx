@@ -1,13 +1,19 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { decryptRandom, encryptRandom } from '../../Security/Encryption'
 import TeacherTimetable from './TeacherTimetable'
 import StaffChatPanel from '../../Chat/StaffChatPanel'
+import { ChatContext } from '../../Context/ChatContext'
 
 const TeacherDash = ({socket}) => {
     const navigate = useNavigate()
     const [staffDetails,setStaffDetails] = useState({})
     const storedEmail = sessionStorage.getItem('email') || null;
+    const {setSocketConn} = useContext(ChatContext)
+
+    useEffect(()=>{
+        setSocketConn(socket)
+    },[socket])
 
     useEffect(()=>{
         const getStaffInfo = async () => {
@@ -77,14 +83,20 @@ const TeacherDash = ({socket}) => {
 
     return (
         <div>
-            <h1>Welcome, Teacher</h1>
-            <button onClick={handleAttendanceClick}>Mark Attendance</button>
-            <button onClick={handleAssignmentClick}>Post Assignment</button>
-            {
-                staffDetails.hasOwnProperty("email") &&
-                <TeacherTimetable details={{gradeId:staffDetails.grade,sectionId:staffDetails.section,academicYear:"2025-00-00",name: staffDetails.name, subject: staffDetails.subject}}/>
-            }
-            {staffDetails.hasOwnProperty('grade') && <StaffChatPanel socket={socket} gradeFromLogin={staffDetails.grade} sectionFromLogin={staffDetails.section} myMail={staffDetails.email}/>}
+            <div className='nav-note'>
+                <span className='welcome-note'>Welcome, Teacher</span>
+                <div>
+                    <button style={{background: 'black', color: 'white'}} onClick={handleAttendanceClick}>Mark Attendance</button>
+                    <button onClick={handleAssignmentClick}>Post Assignment</button>
+                </div>
+            </div>
+            <div>
+                {
+                    staffDetails.hasOwnProperty("email") &&
+                    <TeacherTimetable details={{gradeId:staffDetails.grade,sectionId:staffDetails.section,academicYear:"2025-00-00",name: staffDetails.name, subject: staffDetails.subject}}/>
+                }
+                {staffDetails.hasOwnProperty('grade') && <StaffChatPanel socket={socket} gradeFromLogin={staffDetails.grade} sectionFromLogin={staffDetails.section} myMail={staffDetails.email}/>}
+            </div>
         </div>
     )
 }

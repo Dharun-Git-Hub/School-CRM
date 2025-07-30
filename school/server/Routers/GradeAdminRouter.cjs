@@ -21,7 +21,7 @@ router.post('/addStudentByExcel',upload.single('file'),GradeAdminController.addS
 router.get('/getSubjects',GradeAdminController.getSubjects)
 router.post('/uploadSectionManually',GradeAdminController.uploadSectionManually)
 router.post('/uploadSectionByExcel',upload.single('file'),GradeAdminController.uploadSectionByExcel)
-router.get('/getSections',GradeAdminController.getSections)
+router.post('/getSections',GradeAdminController.getSections)
 router.post('/getStaff',GradeAdminController.getStaff)
 router.post('/addTimeline',GradeAdminController.addTimeline)
 router.post('/getTimeline',GradeAdminController.getTimeline)

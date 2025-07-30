@@ -91,8 +91,8 @@ const Assignments = () => {
     },[])
 
     return (
-        <div>
-            <h1>Assignments</h1>
+        <div className='students-assignments'>
+            <h1 className='welcome-note'>Assignments</h1>
             <ul>
                 {listData.length > 0 && listData.map((el, index) => {
                     const studentSubmission = el.submissions.find(sub => sub.student === details.name);
@@ -103,11 +103,9 @@ const Assignments = () => {
                         <li key={index}>
                             <span>{el.title}</span>
                             <span dangerouslySetInnerHTML={{ __html: el.description }} />
+                            <span>Grade: {el.grade} | Section: {el.section} </span>
+                            <span>Subject: {el.subject} | Staff: {el.teacher}</span>
                             <span>{el.date}</span>
-                            <span>{el.grade}</span>
-                            <span>{el.subject}</span>
-                            <span>{el.section}</span>
-                            <span>{el.teacher}</span>
                             {el.attachments && (
                                 <a
                                     href={URL.createObjectURL(new Blob([new Uint8Array(el.attachments.data)], { type: "application/*" }))}
@@ -116,20 +114,22 @@ const Assignments = () => {
                                     Attachment
                                 </a>
                             )}
-                            <label>
-                                {studentSubmission ? "Re-Upload" : "Upload"} Assignment
-                                <input type="file" onChange={e => setFile(e.target.files[0])} accept=".pdf" />
-                            </label>
-                            <button disabled={!!studentSubmission} onClick={() => handleSubmit(el)}>Submit</button>
                             {
                                 studentSubmission ?
                                     <span style={{ color: 'lime' }}>Submitted</span> :
                                     <span style={{ color: 'red' }}>Not Submitted Yet!</span>
                             }
                             <br />
-                            <strong>Marks: </strong> {mark !== undefined && mark !== null ? mark : "Not Yet Evaluated"}
-                            <br/>
-                            <strong>Feedback: </strong> {feedback?feedback:'Yet to be given'}
+                            <label>
+                                {studentSubmission ? "Re-Upload" : "Upload"} Assignment
+                                <input type="file" onChange={e => setFile(e.target.files[0])} accept=".pdf" />
+                            </label>
+                            <button disabled={!!studentSubmission} onClick={() => handleSubmit(el)}>Submit</button>
+                            <div style={{display: 'flex',gap:'10px'}}>
+                                <strong>Marks:</strong>{mark !== undefined && mark !== null ? mark : "Not Evaluated Yet!"}
+                                
+                                <strong>Feedback: </strong> {feedback?feedback:'Yet to be given'}
+                            </div>
                         </li>
                     );
                 })}

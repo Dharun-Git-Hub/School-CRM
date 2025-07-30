@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { encryptRandom } from '../../Security/Encryption';
+import { ChatContext } from '../../Context/ChatContext';
+import StaffChatPanel from '../../Chat/StaffChatPanel';
 
 const AssignmentPanel = () => {
     const location = useLocation()
@@ -10,6 +12,8 @@ const AssignmentPanel = () => {
     const [compare,setComparator] = useState({})
     const [gained,setGained] = useState({})
     const [total,setTotal] = useState(pageData.total ? pageData.total.toString() : "")
+    const [opened,setOpened] = useState(false)
+    const {socketConn} = useContext(ChatContext)
 
     useEffect(()=>{
         console.log(gained)
@@ -49,6 +53,7 @@ const AssignmentPanel = () => {
     },[pageData])
 
     const handleGain = (e,el) => {
+        setOpened(true)
         if(!isNaN(e.target.value) && Number(total)>0){
             let temp = gained;
             temp[el.student] = {name: el.student, roll: el.roll, gained: Number(e.target.value), total: Number(total)}
@@ -58,6 +63,10 @@ const AssignmentPanel = () => {
     }
 
     const assignMarks = async (el) => {
+        if(!opened){
+            alert('First assign a mark to post!')
+            return
+        }
         try{
             if(total.trim() === ''){
                 alert("Please enter a total value")
@@ -111,46 +120,64 @@ const AssignmentPanel = () => {
     }
 
     return (
-        <div>
-            Assignment Panel
-            <h2>{pageData.title}</h2>
-            <h3>
-                <span dangerouslySetInnerHTML={{__html:pageData.description}}></span>
-            </h3>
-            <h4>Grade - {pageData.grade}</h4>
-            <h5>Subject - {pageData.subject}</h5>
-            <h6>{pageData.date}</h6>
-            <h2>Completed:</h2>
-            <ul>
+        <>
+        <span className='welcome-note'>Assignment Panel</span>
+        <div style={{display:"grid", gridTemplateColumns: "repeat(2,1fr)"}}>
+            <div className='assignment-div' style={{minWidth: '40vw', justifyContent: 'center'}}>
+                <div>
+                    <span className='title-div'>Title:</span><span>{pageData.title}</span>
+                </div>
+                <div>
+                    <span>Description</span>
+                    <span dangerouslySetInnerHTML={{__html:pageData.description}}></span>
+                </div>
+                <div>
+                    <span>Grade: </span>
+                    <span>{pageData.grade} - {pageData.section}</span>
+                </div>
+                <div>
+                    <span>Subject: </span>
+                    <span>{pageData.subject}</span>
+                </div>
+                <div>{pageData.date}</div> 
+            </div>
+            <div style={{display:'flex', flexDirection: 'column', alignItems: 'center'}}>
+                <div style={{marginTop: '10px',fontFamily: 'Poppins'}}>Completed:</div>
+                <ul className='list-completed'>
                 {
                     pageData.submissions.map((el,index)=>(
                         <li key={index}>
-                            Name : {el.student}
-                            Roll: {el.roll}
+                            Name : <span>{el.student}</span>
+                            Roll: <span>{el.roll}</span>
                             Status: {el.submitted ? <span style={{color: "green"}}>Submitted</span> : <span style={{color: "red"}}>Pending</span>}
                             File: <a href={URL.createObjectURL(new Blob([new Uint8Array(el.attachment.data)],{type: "application/*"}))} download={`${el.student}_${el.roll}_${pageData.title}_Assignment.pdf`}>View</a>
-                            Marks: <input value={gained[el.student.gained]} type="number" placeholder={el.marks ? el.marks : 'Marks'} disabled={el.marks} onChange={(e)=>handleGain(e,el)}/> for {total}
-                            Feedback: <textarea placeholder={el.feedback ? el.feedback : 'Your Feedback on the Assignment'} onChange={e=>handleFeedback(el,e)} disabled={el.feedback}></textarea>
-                            <strong>{pageData.submissions.length}</strong> out of {compare?.total?.length} Student(s) Completed
+                            Marks: <input value={gained[el.student.gained]} type="number" placeholder={el.marks ? el.marks : `Marks out of ${total}`} disabled={el.marks} onChange={(e)=>handleGain(e,el)}/>
+                            Feedback: <div><textarea placeholder={el.feedback ? el.feedback : 'Your Feedback on the Assignment'} onChange={e=>handleFeedback(el,e)} disabled={el.feedback}></textarea></div>
                         </li>
                     ))
                 }
-            </ul>
-            <button onClick={assignMarks}>Assign Marks</button>
-            <input placeholder={total} value={total} disabled/>
-            <h2>Incomplete:</h2>
-            <ul>
-                {
-                    compare?.incomplete?.map((el,index)=>(
-                        <li key={index}>
-                            Name : {el.name}{" "}
-                            Roll: {el.roll}
-                            Status: {el.submitted ? <span style={{color: "red"}}>Incomplete</span> : <span style={{color: "red"}}>Pending</span>}
-                        </li>
-                    ))
-                }
-            </ul>
+                </ul>
+                <br/>
+                <button className='assign-button' disabled={pageData.submissions.length<=0} onClick={assignMarks}>Assign Marks</button>
+            </div> 
+            <div style={{display: 'flex',flexDirection:'column',gap:"10px", margin: '10px'}}>
+                <h2>Incomplete:</h2>
+                <strong>{pageData.submissions.length} out of {compare?.total?.length} Student(s) Completed</strong>
+                <ul className='list-completed' style={{width:'40vw',marginTop:'10px',margin: '-15px'}}>
+                    {
+                        compare?.incomplete?.map((el,index)=>(
+                            <li key={index}>
+                                Name : <span>{el.name}{" "}</span>
+                                Roll: <span>{el.roll}</span>
+                                Status: <span>{el.submitted ? <span style={{color: "red"}}>Incomplete</span> : <span style={{color: "red"}}>Pending</span>}</span>
+                            </li>
+                        ))
+                    }
+                </ul>
+            </div>
+            {socketConn && pageData.grade.trim() !== '' && <StaffChatPanel socket={socketConn} gradeFromLogin={pageData.grade} sectionFromLogin={pageData.section} myMail={pageData.email}/>}
         </div>
+        </>
     )
 }
 

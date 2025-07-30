@@ -10,6 +10,7 @@ const Field = ({gradeList, subjectsList, fieldIndex, fieldData, updateField, rem
     const [grade, setGrade] = useState(fieldData.grade || '')
     const [section, setSection] = useState(fieldData.section || '')
     const [subject, setSubject] = useState(fieldData.subject || '')
+    const [code,setCode] = useState(fieldData.code || '')
 
     useEffect(() => {
         setName(fieldData.name || '')
@@ -19,29 +20,30 @@ const Field = ({gradeList, subjectsList, fieldIndex, fieldData, updateField, rem
         setGrade(fieldData.grade || '')
         setSection(fieldData.section || '')
         setSubject(fieldData.subject || '')
-    }, [fieldData.name, fieldData.email, fieldData.phone, fieldData.role, fieldData.grade, fieldData.section, fieldData.subject])
+        setCode(fieldData.code || '')
+    },[fieldData.name, fieldData.email, fieldData.phone, fieldData.role, fieldData.grade, fieldData.section, fieldData.subject, fieldData.code])
 
     useEffect(() => {
         if(gradeList.find(el=>el===grade)){
-            updateField(fieldIndex, { name, email, phone, role, grade, section, subject })
+            updateField(fieldIndex, { name, email, phone, role, grade, section, subject, code })
         }
         else{
             setGrade('')
         }
         const exists = sectionList.filter(el=>el.grade===grade)
         if(exists.find(el=>el.name===section)){
-            updateField(fieldIndex, { name, email, phone, role, grade, section, subject })
+            updateField(fieldIndex, { name, email, phone, role, grade, section, subject,code })
         }
         else{
             setSection('')
         }
         if(subjectsList.find(el=>el===subject)){
-            updateField(fieldIndex, { name, email, phone, role, grade, section, subject })
+            updateField(fieldIndex, { name, email, phone, role, grade, section, subject,code })
         }
         else{
             setSubject('')
         }
-    }, [name, email, phone, role, grade, section, subject])
+    }, [name, email, phone, role, grade, section, subject,code])
 
     return (
         <div style={{border: '1px solid #ccc', padding: 10, marginBottom: 10}}>
@@ -74,6 +76,7 @@ const Field = ({gradeList, subjectsList, fieldIndex, fieldData, updateField, rem
                     ))
                 }
             </datalist>
+            <input placeholder='Subject Code' value={code} onChange={e => setCode(e.target.value)}/>
             {canRemove && <button type="button" onClick={() => removeField(fieldIndex)}>- Remove Field</button>}
         </div>
     )
@@ -81,7 +84,7 @@ const Field = ({gradeList, subjectsList, fieldIndex, fieldData, updateField, rem
 
 const GradeStaff = ({myGrade}) => {
     const [file,setFile] = useState(null)
-    const [fields, setFields] = useState([{ name: "", email: "", phone: "", role: "", grade: "", section: "", subject: "" }])
+    const [fields, setFields] = useState([{ name: "", email: "", phone: "", role: "", grade: "", section: "", subject: "", code: "" }])
     const [gradeList,setGrades] = useState([])
     const [sectionList,setSections] = useState([])
     const [subjectsList,setSubjects] = useState([])
@@ -103,7 +106,11 @@ const GradeStaff = ({myGrade}) => {
                 console.log(err)
             }
             try{
-                const response = await fetch('http://localhost:3000/grade/getSections');
+                const response = await fetch('http://localhost:3000/grade/getSections',{
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({details:myGrade})
+                });
                 const data = await response.json()
                 if(data.status === 'success'){
                     console.log(data.list)
@@ -135,7 +142,7 @@ const GradeStaff = ({myGrade}) => {
     },[])
 
     const addField = () => {
-        setFields(prev => [...prev, { name: "", email: "", phone: "", role: "", grade: "", section: "", subject: "" }])
+        setFields(prev => [...prev, { name: "", email: "", phone: "", role: "", grade: "", section: "", subject: "", code: '' }])
     }
     const removeField = (index) => {
         setFields(prev => prev.filter((_, i) => i !== index))
@@ -183,7 +190,7 @@ const GradeStaff = ({myGrade}) => {
             return
         }
         for(let i=0;i<fields.length;i++){
-            if(fields[i].name.trim() === '' || fields[i].email.trim() === '' || fields[i].phone.trim() === '' || fields[i].role.trim() === '' || fields[i].grade.trim() === '' || fields[i].section.trim() === '' || fields[i].subject.trim() === ''){
+            if(fields[i].name.trim() === '' || fields[i].email.trim() === '' || fields[i].phone.trim() === '' || fields[i].role.trim() === '' || fields[i].grade.trim() === '' || fields[i].section.trim() === '' || fields[i].subject.trim() === '' || fields[i].code.trim() === ''){
                 alert('Fill up all the fields!')
                 return;
             }
@@ -207,7 +214,7 @@ const GradeStaff = ({myGrade}) => {
             console.log(data)
             if(data.status === 'success'){
                 alert('Teacher(s) Created!')
-                setFields([{ name: "", email: "", phone: "", role: "", grade: "", section: "", subject: "" }])
+                setFields([{ name: "", email: "", phone: "", role: "", grade: "", section: "", subject: "",code: '' }])
                 return;
             }
             else{
@@ -222,10 +229,10 @@ const GradeStaff = ({myGrade}) => {
     }
 
     return (
-        <div>
+        <div className='dash-div'>
             <h1>Add Staff</h1>
             <input type="file" accept='.xlsx' onChange={(e)=>setFile(e.target.files[0])}/>
-            <button onClick={handleUpload}>Upload using Excel Sheet</button>
+            <button style={{background: '#1f1f1f',color:'white'}} onClick={handleUpload}>Upload using Excel Sheet</button>
             <button type="button" onClick={addField}>+ Add Field</button>
             {gradeList.length > 0 && fields.map((field, index) => (
                 <Field
