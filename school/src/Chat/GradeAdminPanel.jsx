@@ -362,7 +362,7 @@ const GradeAdminPanel = ({ socket, grade }) => {
                             <input
                                 value={input}
                                 onChange={e => setInput(e.target.value)}
-                                placeholder={selectedStaff ? `Message ${selectedStaff}...` : "Type your message..."}
+                                placeholder={selectedStaff ? `Message... ${grade} - ${namedStaff.find(el => el.email === selectedStaff)?.section}` : "Message..."}
                                 style={styles.input}
                                 onKeyDown={handleKey}
                                 ref={inputRef}

@@ -39,7 +39,7 @@ const SuperAdminDash = ({socket}) => {
     }
 
     return (
-        <>
+        <div style={{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',overflow:'auto',scrollBehavior:'smooth'}}>
             <div className='nav-note'>
                 <span className='welcome-note'>Welcome, Super Admin!</span>
                 <div>
@@ -55,7 +55,7 @@ const SuperAdminDash = ({socket}) => {
                 <SuperAddGradeAdmin/>
                 {socket && <SuperAdminPanel socket={socket}/>}
             </div>
-        </>
+        </div>
     )
 }
 

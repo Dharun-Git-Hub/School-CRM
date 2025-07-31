@@ -63,19 +63,22 @@ const GradeTimeSlots = () => {
     }
 
     return (
-        <div className='slots-cont'>
-            <input placeholder='Grade' list="grade-list" value={myGrade} disabled/>
-            <input placeholder='Section' list="list-sections" value={sectionId} onChange={e=>setSectionId(e.target.value)}/>
-            <datalist id="list-sections">
-                {
-                    sectionList.map((el, index) => (
-                            <option key={index} value={el.name}>{el.name}</option>
-                        ))
-                }
-            </datalist>
-            <input type='date' placeholder='Academic Year' onChange={e=>setAcademicYear(e.target.value)}/>
-            <button onClick={goToScheduler}>Schedule Timetable</button>
-            {socketConn && myGrade.trim() !== '' && <GradeAdminPanel socket={socketConn} grade={myGrade}/>}
+        <div style={{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',overflow:'auto',scrollBehavior:'smooth'}}>
+            <div className='slots-cont'>
+                <input placeholder='Grade' list="grade-list" value={myGrade} disabled/>
+                <input placeholder='Section' list="list-sections" value={sectionId} onChange={e=>setSectionId(e.target.value)}/>
+                <datalist id="list-sections">
+                    {
+                        sectionList.map((el, index) => (
+                                <option key={index} value={el.name}>{el.name}</option>
+                            ))
+                    }
+                </datalist>
+                <input type='date' placeholder='Academic Year' onChange={e=>setAcademicYear(e.target.value)}/>
+                <button onClick={goToScheduler}>Schedule Timetable</button>
+                {socketConn && myGrade.trim() !== '' && <GradeAdminPanel socket={socketConn} grade={myGrade}/>}
+            </div>
+            
         </div>
     )
 }

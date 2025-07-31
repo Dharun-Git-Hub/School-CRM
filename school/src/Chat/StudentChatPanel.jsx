@@ -199,7 +199,7 @@ const StudentChatPanel = ({ socket, gradeFromLogin, sectionFromLogin, toMail }) 
                             <input
                                 value={input}
                                 onChange={e => setInput(e.target.value)}
-                                placeholder="Type message..."
+                                placeholder="Message..."
                                 onKeyDown={(e)=>handleKey(e)}
                                 style={styles.input}
                                 ref={inputRef}

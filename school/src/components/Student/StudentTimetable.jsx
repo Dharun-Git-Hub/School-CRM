@@ -68,7 +68,7 @@ const StudentTimetable = ({details}) => {
                                 const detailsSlot = getSlotDetails(day, period);
                                 return (
                                     <td
-                                        className="d3-tab"
+                                        className={detailsSlot && "d3-tab"}
                                         key={pIndex}
                                         style={{
                                             background: !detailsSlot && 'transparent',

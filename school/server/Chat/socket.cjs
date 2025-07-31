@@ -1,66 +1,21 @@
 const WebSocket = require('ws')
 const {v4:uuid} = require('uuid')
-const { Component } = require('react')
 const PORT = 8000
 
-const clients = new Map()                   // WS -> ID
-const namedClients = new Map()              // ID -> Name
-const rooms = new Map()                     // Room_Name -> Room_Properties
+const clients = require('../Helpers/Chat_Helpers.cjs').clients
+const namedClients = require('../Helpers/Chat_Helpers.cjs').namedClients
+const rooms = require('../Helpers/Chat_Helpers.cjs').rooms
+const enc = require('../Helpers/Chat_Helpers.cjs').enc
+const sendGradeAdminsNameToSuper = require('../Helpers/Chat_Helpers.cjs').sendGradeAdminsNameToSuper
+const sendStaffNamesToGradeAdmin = require('../Helpers/Chat_Helpers.cjs').sendStaffNamesToGradeAdmin
+const sendStudentsNameToStaff = require('../Helpers/Chat_Helpers.cjs').sendStudentsNameToStaff
 
 const wss = new WebSocket.Server({port:PORT})
-
-const enc = (msg) => {
-    return JSON.stringify(msg)
-}
 
 const showAll = () => {
     console.log('Named Clients')
     console.log(namedClients)
 }
-
-// Helper Functions
-
-const sendGradeAdminsNameToSuper = () => {
-    const gradeAdmins = rooms.get('superRoom').people;
-    let gradeAdminsName = [];
-    for(let i of gradeAdmins) {
-        if(i.hasOwnProperty('grade')){
-            for(let name of i["grade"]){
-                gradeAdminsName.push(namedClients.get(name));
-            }
-        }
-    }
-    return gradeAdminsName;
-};
-
-const sendStaffNamesToGradeAdmin = (grade) => {
-    const staff = rooms.get(`gradeRoom_${grade}`).people;
-    let staffNames = [];
-    for(let i of staff){
-        if(i.hasOwnProperty('staff')){
-            for(let name of i["staff"]){
-                staffNames.push(namedClients.get(name));
-            }
-        }
-    }
-    return staffNames;
-};
-
-const sendStudentsNameToStaff = (grade,section) => {
-    const student = rooms.get(`studentRoom_${grade}_${section}`).people
-    let studentNames = [];
-    for(let i of student){
-        if(i.hasOwnProperty('students')){
-            for(let name of i['students']){
-                studentNames.push(namedClients.get(name));
-            }
-        }
-    }
-    console.log(`The Students of ${grade} - ${section} is : ${studentNames}`)
-    return studentNames;
-}
-
-// ______________________________________________________________________________________________
 
 wss.on('connection',(ws)=>{
     const userId = uuid()

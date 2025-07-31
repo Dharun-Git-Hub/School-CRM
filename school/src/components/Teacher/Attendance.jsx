@@ -181,7 +181,7 @@ const Attendance = () => {
     }
 
     return (
-        <div>
+        <div style={{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',overflow:'auto',scrollBehavior:'smooth'}}>
             <h1 className='welcome-note'>Attendance</h1>
             <h2 className='welcome-note'>{currentDate} - {currentMonth} - {currentYear}</h2>
             <br />

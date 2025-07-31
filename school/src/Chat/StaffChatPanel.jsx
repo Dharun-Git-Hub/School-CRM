@@ -398,7 +398,7 @@ const StaffChatPanel = ({socket, gradeFromLogin, sectionFromLogin, myMail}) => {
                             <input
                                 value={input}
                                 onChange={e => setInput(e.target.value)}
-                                placeholder={selectedStudent ? `Message ${selectedStudent}...` : "Type your message..."}
+                                placeholder={selectedStudent ? `Message... ${namedStudent.find(el=>el.email === selectedStudent).roll}` : "Message..."}
                                 style={styles.input}
                                 onKeyDown={handleKey}
                                 ref={inputRef}

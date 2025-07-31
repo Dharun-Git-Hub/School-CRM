@@ -60,7 +60,7 @@ const StudentDash = ({socket}) => {
     },[])
     
     return (
-        <div className='entry' style={{flexDirection:"column", background: '#333'}}>
+        <div className='entry' style={{flexDirection:"column", background: '#333', position: 'fixed'}}>
             <h1 className='student-h1'>Welcome, {details.name}
                 <h4 style={{fontSize:"12px",color:"#aaa",position:"absolute",right:"1vw"}}>Email: {details.email}</h4>
             </h1>

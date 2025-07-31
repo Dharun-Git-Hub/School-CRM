@@ -267,7 +267,7 @@
     width: 100%;
 }
 .teacher-timetable tbody tr td{
-    width: 200px;
+    width: 190px;
     height: 50px;
     padding: 10px;
     border-radius: 10px;
@@ -624,6 +624,7 @@
 }
 .d3-tab{
     background: linear-gradient(to bottom right,rgba(100,100,100,0.5) 20%,rgba(0,0,0,0.1));
+    animation: fade 1s;
     transition: all 2s ease;
 }
 .d3-tab:hover{
@@ -649,9 +650,19 @@
   z-index: 10;
   opacity: 1;
   visibility: visible;
+  animation: fade 1s;
 }
 .d3-tab::after {
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.2s ease-in-out;
+}
+@keyframes fade {
+    from{
+        background: linear-gradient(to right,transparent,black);
+        opacity: 0;
+    }
+    to{
+        opacity: 1;
+    }
 }

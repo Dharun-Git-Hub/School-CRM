@@ -109,7 +109,7 @@ const SuperAdminPanel = ({socket}) => {
         container: {
             width: selectedAdmin ? '60%' : '300px',
             display: 'flex',
-            height: '100vh',
+            height: '80vh',
             fontFamily: 'Arial, sans-serif',
             position: 'fixed',
             right: '1vw',
@@ -177,6 +177,7 @@ const SuperAdminPanel = ({socket}) => {
         inputArea: {
             display: 'flex',
             gap: '10px',
+            marginLeft: '10px'
         },
         input: {
             flex: 1,
@@ -253,7 +254,7 @@ const SuperAdminPanel = ({socket}) => {
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
                                     style={styles.input}
-                                    placeholder="Type your message..."
+                                    placeholder="Message..."
                                     onKeyDown={(e)=>handleKey(e)}
                                     ref={inputRef}
                                 />

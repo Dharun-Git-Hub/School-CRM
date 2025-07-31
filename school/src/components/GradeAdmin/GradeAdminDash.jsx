@@ -40,24 +40,26 @@ const GradeAdminDash = ({socket}) => {
     },[])
 
     return (
-        <div>
-            <div className='nav-note'>
-                <span className='welcome-note'>Welcome, Grade Admin!</span>
-                <div>
-                    <button onClick={()=>navigate('/grade-logs',{state:myGrade})}>Logs</button>
-                    <button style={{background: '#1f1f1f',color:'white'}} onClick={()=>navigate('/grade-timeslots',{state:myGrade})}>Timeslots</button>
+        <div style={{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',overflow:'auto',scrollBehavior:'smooth'}}>
+            <div>
+                <div className='nav-note'>
+                    <span className='welcome-note'>Welcome, Grade Admin!</span>
+                    <div>
+                        <button onClick={()=>navigate('/grade-logs',{state:myGrade})}>Logs</button>
+                        <button style={{background: '#1f1f1f',color:'white'}} onClick={()=>navigate('/grade-timeslots',{state:myGrade})}>Timeslots</button>
+                    </div>
                 </div>
-            </div>
-            <div style={{display: 'flex'}}>
-                { myGrade.trim() !== '' &&
-                    <>
-                        <GradeStaff myGrade={myGrade}/>
-                        <GradeSubject myGrade={myGrade}/>
-                        <GradeAdminStudent myGrade={myGrade}/>
-                        <GradeSection myGrade={myGrade}/>
-                    </>
-                }
-                {socket && myGrade.trim() !== '' && <GradeAdminPanel socket={socket} grade={myGrade}/>}
+                <div style={{display: 'flex'}}>
+                    { myGrade.trim() !== '' &&
+                        <>
+                            <GradeStaff myGrade={myGrade}/>
+                            <GradeSubject myGrade={myGrade}/>
+                            <GradeAdminStudent myGrade={myGrade}/>
+                            <GradeSection myGrade={myGrade}/>
+                        </>
+                    }
+                    {socket && myGrade.trim() !== '' && <GradeAdminPanel socket={socket} grade={myGrade}/>}
+                </div>
             </div>
         </div>
     )

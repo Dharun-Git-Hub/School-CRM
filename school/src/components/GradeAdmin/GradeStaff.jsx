@@ -128,7 +128,7 @@ const GradeStaff = ({myGrade}) => {
                 const data = await response.json()
                 if(data.status === 'success'){
                     console.log(data.list)
-                    setSubjects(data.list)
+                    setSubjects([...new Set(data.list)])
                 }
                 else{
                     alert(data.message)

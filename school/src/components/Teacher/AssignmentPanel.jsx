@@ -120,64 +120,64 @@ const AssignmentPanel = () => {
     }
 
     return (
-        <>
-        <span className='welcome-note'>Assignment Panel</span>
-        <div style={{display:"grid", gridTemplateColumns: "repeat(2,1fr)"}}>
-            <div className='assignment-div' style={{minWidth: '40vw', justifyContent: 'center'}}>
-                <div>
-                    <span className='title-div'>Title:</span><span>{pageData.title}</span>
+        <div style={{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',overflow:'auto',scrollBehavior:'smooth'}}>
+            <span className='welcome-note'>Assignment Panel</span>
+            <div style={{display:"grid", gridTemplateColumns: "repeat(2,1fr)"}}>
+                <div className='assignment-div' style={{minWidth: '40vw', justifyContent: 'center'}}>
+                    <div>
+                        <span className='title-div'>Title:</span><span>{pageData.title}</span>
+                    </div>
+                    <div>
+                        <span>Description</span>
+                        <span dangerouslySetInnerHTML={{__html:pageData.description}}></span>
+                    </div>
+                    <div>
+                        <span>Grade: </span>
+                        <span>{pageData.grade} - {pageData.section}</span>
+                    </div>
+                    <div>
+                        <span>Subject: </span>
+                        <span>{pageData.subject}</span>
+                    </div>
+                    <div>{pageData.date}</div> 
                 </div>
-                <div>
-                    <span>Description</span>
-                    <span dangerouslySetInnerHTML={{__html:pageData.description}}></span>
-                </div>
-                <div>
-                    <span>Grade: </span>
-                    <span>{pageData.grade} - {pageData.section}</span>
-                </div>
-                <div>
-                    <span>Subject: </span>
-                    <span>{pageData.subject}</span>
-                </div>
-                <div>{pageData.date}</div> 
-            </div>
-            <div style={{display:'flex', flexDirection: 'column', alignItems: 'center'}}>
-                <div style={{marginTop: '10px',fontFamily: 'Poppins'}}>Completed:</div>
-                <ul className='list-completed'>
-                {
-                    pageData.submissions.map((el,index)=>(
-                        <li key={index}>
-                            Name : <span>{el.student}</span>
-                            Roll: <span>{el.roll}</span>
-                            Status: {el.submitted ? <span style={{color: "green"}}>Submitted</span> : <span style={{color: "red"}}>Pending</span>}
-                            File: <a href={URL.createObjectURL(new Blob([new Uint8Array(el.attachment.data)],{type: "application/*"}))} download={`${el.student}_${el.roll}_${pageData.title}_Assignment.pdf`}>View</a>
-                            Marks: <input value={gained[el.student.gained]} type="number" placeholder={el.marks ? el.marks : `Marks out of ${total}`} disabled={el.marks} onChange={(e)=>handleGain(e,el)}/>
-                            Feedback: <div><textarea placeholder={el.feedback ? el.feedback : 'Your Feedback on the Assignment'} onChange={e=>handleFeedback(el,e)} disabled={el.feedback}></textarea></div>
-                        </li>
-                    ))
-                }
-                </ul>
-                <br/>
-                <button className='assign-button' disabled={pageData.submissions.length<=0} onClick={assignMarks}>Assign Marks</button>
-            </div> 
-            <div style={{display: 'flex',flexDirection:'column',gap:"10px", margin: '10px'}}>
-                <h2>Incomplete:</h2>
-                <strong>{pageData.submissions.length} out of {compare?.total?.length} Student(s) Completed</strong>
-                <ul className='list-completed' style={{width:'40vw',marginTop:'10px',margin: '-15px'}}>
+                <div style={{display:'flex', flexDirection: 'column', alignItems: 'center'}}>
+                    <div style={{marginTop: '10px',fontFamily: 'Poppins'}}>Completed:</div>
+                    <ul className='list-completed'>
                     {
-                        compare?.incomplete?.map((el,index)=>(
+                        pageData.submissions.map((el,index)=>(
                             <li key={index}>
-                                Name : <span>{el.name}{" "}</span>
+                                Name : <span>{el.student}</span>
                                 Roll: <span>{el.roll}</span>
-                                Status: <span>{el.submitted ? <span style={{color: "red"}}>Incomplete</span> : <span style={{color: "red"}}>Pending</span>}</span>
+                                Status: {el.submitted ? <span style={{color: "green"}}>Submitted</span> : <span style={{color: "red"}}>Pending</span>}
+                                File: <a href={URL.createObjectURL(new Blob([new Uint8Array(el.attachment.data)],{type: "application/*"}))} download={`${el.student}_${el.roll}_${pageData.title}_Assignment.pdf`}>View</a>
+                                Marks: <input value={gained[el.student.gained]} type="number" placeholder={el.marks ? el.marks : `Marks out of ${total}`} disabled={el.marks} onChange={(e)=>handleGain(e,el)}/>
+                                Feedback: <div><textarea placeholder={el.feedback ? el.feedback : 'Your Feedback on the Assignment'} onChange={e=>handleFeedback(el,e)} disabled={el.feedback}></textarea></div>
                             </li>
                         ))
                     }
-                </ul>
+                    </ul>
+                    <br/>
+                    <button className='assign-button' disabled={pageData.submissions.length<=0} onClick={assignMarks}>Assign Marks</button>
+                </div> 
+                <div style={{display: 'flex',flexDirection:'column',gap:"10px", margin: '10px'}}>
+                    <h2>Incomplete:</h2>
+                    <strong>{pageData.submissions.length} out of {compare?.total?.length} Student(s) Completed</strong>
+                    <ul className='list-completed' style={{width:'40vw',marginTop:'10px',margin: '-15px'}}>
+                        {
+                            compare?.incomplete?.map((el,index)=>(
+                                <li key={index}>
+                                    Name : <span>{el.name}{" "}</span>
+                                    Roll: <span>{el.roll}</span>
+                                    Status: <span>{el.submitted ? <span style={{color: "red"}}>Incomplete</span> : <span style={{color: "red"}}>Pending</span>}</span>
+                                </li>
+                            ))
+                        }
+                    </ul>
+                </div>
+                {socketConn && pageData.grade.trim() !== '' && <StaffChatPanel socket={socketConn} gradeFromLogin={pageData.grade} sectionFromLogin={pageData.section} myMail={pageData.email}/>}
             </div>
-            {socketConn && pageData.grade.trim() !== '' && <StaffChatPanel socket={socketConn} gradeFromLogin={pageData.grade} sectionFromLogin={pageData.section} myMail={pageData.email}/>}
         </div>
-        </>
     )
 }
 

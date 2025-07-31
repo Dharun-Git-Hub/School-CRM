@@ -142,7 +142,7 @@ const Timetable = () => {
         };
 
         return (
-            <div className='forgot-cont' style={{ fontFamily: 'Poppins', width: 'fit-content',gap: '0px', marginTop: '20px', border: '1px solid silver', boxShadow: "0 0 0.3rem silver", borderRadius: '10px', padding: '10px', height: 'fit-content' }}>
+            <div className='forgot-cont' style={{ fontFamily: 'Poppins', width: 'fit-content',gap: '0px', marginTop: '20px', marginBottom: '40px', border: '1px solid silver', boxShadow: "0 0 0.3rem silver", borderRadius: '10px', padding: '10px', height: 'fit-content' }}>
                 <h3 className='welcome-note'>Schedule Period</h3>
                 <p>Day: {formData.day}, Period: {formData.period}</p>
                 <p>Time: {formData.startTime} - {formData.endTime}</p>
@@ -195,11 +195,10 @@ const Timetable = () => {
     }
 
     return (
-        <div style={{ padding: "20px" }}>
+        <div style={{padding: '20px',position:'fixed',top:0,left:0,width:'100vw',height:'100vh',overflow:'auto',scrollBehavior:'smooth'}}>
             <h1 style={{fontFamily:'Poppins'}}>Timetable</h1>
-            <h2>Grade: {details.myGrade}</h2>
-            <h3>Section: {details.sectionId}</h3>
-            <h4>Academic Year: {details.academicYear.split("-")[0]} - {Number(details.academicYear.split("-")[0]) + 1}</h4>
+            <h2 style={{fontFamily:'Poppins',fontSize:'0.9rem',color:'#333'}}>Grade: {details.myGrade}<span style={{fontFamily:'Poppins',fontSize:'0.9rem',color:'#333'}}> {details.sectionId}</span></h2>
+            <h4 style={{fontFamily:'Poppins',fontSize:'0.7rem',color:'#333'}}>{details.academicYear.split("-")[0]} - {Number(details.academicYear.split("-")[0]) + 1}</h4>
             <table className='teacher-timetable' border="1" style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
                     <tr>
@@ -216,8 +215,7 @@ const Timetable = () => {
                             {periods.map((period, pIndex) => {
                                 const detailsSlot = getSlotDetails(day, period);
                                 return (
-                                    <td
-                                        key={pIndex}
+                                    <td key={pIndex}
                                         onClick={()=> !detailsSlot && extract(day, period, startTimes[pIndex], endTimes[pIndex])}
                                         style={{
                                             backgroundColor: detailsSlot ? '#d3d3d3' : 'white',
@@ -231,8 +229,7 @@ const Timetable = () => {
                                             detailsSlot
                                                 ? `${detailsSlot.timeslots?.teacher} - ${detailsSlot.timeslots?.subject}\n${detailsSlot.timeslots?.startTime} - ${detailsSlot.timeslots?.endTime}`
                                                 : ''
-                                        }
-                                    >
+                                        }>
                                         {detailsSlot ? (
                                             <div>
                                                 <div><strong>{detailsSlot.timeslots?.subject}</strong></div>
