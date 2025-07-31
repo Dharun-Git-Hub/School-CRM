@@ -86,19 +86,7 @@ const StudentChatPanel = ({ socket, gradeFromLogin, sectionFromLogin, toMail }) 
             bottom: '1vh',
             zIndex: 100,
             padding: '20px',
-            width: '350px',
-            
-        },
-        chatBox: {
-            width: '100%',
-            height: '400px',
-            display: 'flex',
-            flexDirection: 'column',
-            background: 'white',
-            borderRadius: '1.5rem',
-            overflow: 'hidden',
-            padding: '20px',
-            animation: 'none',
+            width: '350px',  
         },
         setup: {
             display: 'flex',
@@ -128,7 +116,7 @@ const StudentChatPanel = ({ socket, gradeFromLogin, sectionFromLogin, toMail }) 
             height: '400px',
             display: 'flex',
             flexDirection: 'column',
-            background: 'white',
+            background: 'rgba(1,1,1,0.2)',
             borderRadius: '1.5rem',
             overflow: 'hidden',
             padding: '20px',
@@ -154,15 +142,18 @@ const StudentChatPanel = ({ socket, gradeFromLogin, sectionFromLogin, toMail }) 
             border: 'none',
             outline: 'none',
             fontSize: '1rem',
+            background: 'transparent',
+            color: '#aaa'
         },
         sendButton: {
             padding: '0.5rem 1rem',
-            backgroundColor: '#007bff',
+            backgroundColor: '#222',
             color: '#fff',
             border: 'none',
             borderRadius: '10px',
             cursor: 'pointer',
             marginLeft: '0.5rem',
+            boxShadow: 'none'
         },
         message: {
             display: 'flex',
@@ -190,13 +181,14 @@ const StudentChatPanel = ({ socket, gradeFromLogin, sectionFromLogin, toMail }) 
                                     }}
                                 >
                                     <div style={{
-                                        backgroundColor: msg.from === 'me' ? '#ffeaf9ff' : '#e1f5fe',
+                                        backgroundColor: msg.from === 'me' ? '#434446c7' : '#933cfd38',
                                         padding: '8px 12px',
                                         borderRadius: '10px',
                                         maxWidth: '100%',
                                         boxShadow: '0 0 0.5rem rgba(0,0,0,0.1)',
                                         wordWrap: 'break-word',
-                                        fontSize: '0.9rem'
+                                        fontSize: '0.9rem',
+                                        color: 'white'
                                     }}>
                                         <strong>{msg.from !== 'me' && msg.from.charAt(0).toUpperCase()+'taff' || "You"}: </strong>{msg.text}
                                     </div>

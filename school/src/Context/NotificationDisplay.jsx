@@ -11,7 +11,7 @@ const NotificationDisplay = () => {
             const timer = setTimeout(()=>{
                 setMsg(null);
                 setFrom(null);
-            }, 10000);
+            }, 6000);
             return () => clearTimeout(timer);
         }
     }, [msg, from, setFrom, setMsg]);

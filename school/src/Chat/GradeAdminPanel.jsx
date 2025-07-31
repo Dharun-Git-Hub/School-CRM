@@ -11,11 +11,11 @@ const GradeAdminPanel = ({ socket, grade }) => {
     const {notify} = useContext(ChatContext)
     const inputRef = useRef(null)
     
-        useEffect(()=>{
-            if(inputRef?.current){
-                inputRef?.current?.focus()
-            }
-        })
+    useEffect(()=>{
+        if(inputRef?.current){
+            inputRef?.current?.focus()
+        }
+    })
     
     useEffect(()=>{
         console.log(grade)
@@ -47,6 +47,9 @@ const GradeAdminPanel = ({ socket, grade }) => {
 
     useEffect(() => {
         if (!socket) return;
+        if(namedStaff.length <= 0){
+            return
+        }
         const identifyAsGradeAdmin = () => {
             socket.send(JSON.stringify({
                 type: 'my_name',
@@ -108,7 +111,7 @@ const GradeAdminPanel = ({ socket, grade }) => {
             socket.removeEventListener('message', handleMessage);
             socket.removeEventListener('open', identifyAsGradeAdmin);
         };
-    },[socket, grade, selectedStaff]);
+    },[socket, grade, selectedStaff,namedStaff]);
 
     useEffect(()=>{
         if(view === 'staff' && socket && grade){

@@ -14,11 +14,11 @@ const StaffChatPanel = ({socket, gradeFromLogin, sectionFromLogin, myMail}) => {
 
     const inputRef = useRef(null)
     
-        useEffect(()=>{
-            if(inputRef?.current){
-                inputRef?.current?.focus()
-            }
-        })
+    useEffect(()=>{
+        if(inputRef?.current){
+            inputRef?.current?.focus()
+        }
+    })
 
     useEffect(()=>{
         const loadGradeName = async () => {
@@ -64,6 +64,9 @@ const StaffChatPanel = ({socket, gradeFromLogin, sectionFromLogin, myMail}) => {
 
     useEffect(()=>{
         if(!socket) return;
+        if(namedStudent.length <= 0){
+            return
+        }
         const identifyAsStaff = () =>{
             socket.send(JSON.stringify({
                 type: 'my_name',
@@ -104,7 +107,7 @@ const StaffChatPanel = ({socket, gradeFromLogin, sectionFromLogin, myMail}) => {
                     ...prev,
                     [studentName]: [...(prev[studentName] || []),{from: studentName, text: data.message}]
                 }))
-                notify(data.message,`Roll No.: ${namedStudent.find(el=>el.email===studentName).roll}`)
+                notify(data.message,`Roll No.: ${namedStudent?.find(el=>el.email===studentName)?.roll}`)
             }
             else if(data.type === 'private_message_from_staff'){
                 const studentName = data.to || selectedStudent;
@@ -124,7 +127,7 @@ const StaffChatPanel = ({socket, gradeFromLogin, sectionFromLogin, myMail}) => {
             socket.removeEventListener('message', handleMessage);
             socket.removeEventListener('open', identifyAsStaff);
         };
-    },[socket, gradeFromLogin, selectedStudent]);
+    },[socket, gradeFromLogin, selectedStudent,namedStudent]);
 
     useEffect(()=>{
         if(view === 'student' && socket && gradeFromLogin && sectionFromLogin){

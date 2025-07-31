@@ -555,6 +555,14 @@
     padding:1px 10px;
     border-radius: 10px;
 }
+
+.d3-tab[title=""]:hover::after,
+.d3-tab:not([title]):hover::after{
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none;
+}
+
 .students-assignments ul li button{
     margin: 10px;
     background-color: #1f1f1f;
@@ -613,4 +621,37 @@
     font-size: 1rem;
     color: #1f1f1f;
     font-weight: 600;
+}
+.d3-tab{
+    background: linear-gradient(to bottom right,rgba(100,100,100,0.5) 20%,rgba(0,0,0,0.1));
+    transition: all 2s ease;
+}
+.d3-tab:hover{
+    background: linear-gradient(to left,rgba(100,100,100,0.5) 20%,rgba(0,0,0,0.1));
+}
+.d3-tab{
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+.d3-tab:hover::after{
+  content: attr(title);
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: aliceblue;
+  color: #111;
+  padding: 5px 10px;
+  border-radius: 5px;
+  white-space: nowrap;
+  font-size: 12px;
+  z-index: 10;
+  opacity: 1;
+  visibility: visible;
+}
+.d3-tab::after {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease-in-out;
 }

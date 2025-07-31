@@ -68,9 +68,10 @@ const StudentTimetable = ({details}) => {
                                 const detailsSlot = getSlotDetails(day, period);
                                 return (
                                     <td
+                                        className="d3-tab"
                                         key={pIndex}
                                         style={{
-                                            background: detailsSlot ? 'linear-gradient(to bottom right,rgba(100,100,100,0.5) 20%,rgba(0,0,0,0.1))' : 'transparent',
+                                            background: !detailsSlot && 'transparent',
                                             color: "white",
                                             boxShadow: 'none',
                                             cursor: detailsSlot ? 'pointer' : 'pointer',
@@ -79,11 +80,10 @@ const StudentTimetable = ({details}) => {
                                             width: '150px',
                                         }}
                                         title={
-                                            detailsSlot
-                                                ? `${detailsSlot.timeslots?.teacher} - ${detailsSlot.timeslots?.subject}\n${detailsSlot.timeslots?.startTime} - ${detailsSlot.timeslots?.endTime}`
-                                                : ''
-                                        }
-                                    >
+                                            detailsSlot ?
+                                            `${detailsSlot.timeslots?.teacher} - ${detailsSlot.timeslots?.subject}\n${detailsSlot.timeslots?.startTime} - ${detailsSlot.timeslots?.endTime}`
+                                            : ''
+                                        }>
                                         {detailsSlot ? (
                                             <div>
                                                 <div style={{margin: '10px'}}><strong style={{color: '#fff'}}>{detailsSlot?.gradeID === details.grade ? detailsSlot.timeslots?.subject : ""}</strong></div>
