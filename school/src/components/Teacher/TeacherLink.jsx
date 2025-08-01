@@ -44,9 +44,9 @@ const TeacherLink = () => {
         }
     }
     return (
-        <div>
-            <h2>Set New Password</h2>
-            <form onSubmit={changePassword}>
+        <div className='forgot-cont'>
+            <h2 style={{fontFamily:'Poppins'}}>Set New Password</h2>
+            <form className='link-form' onSubmit={changePassword}>
                 <input placeholder='email' value={email} disabled/>
                 <input placeholder='New Password' type="text" onChange={(e)=>setPassword(e.target.value)}/>
                 <input placeholder='Retype New Password' type="password" onChange={(e)=>setNewPassword(e.target.value)}/>

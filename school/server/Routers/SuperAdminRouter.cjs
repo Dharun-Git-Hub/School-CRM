@@ -23,6 +23,7 @@ router.post('/createGradeAdmin',SuperAdminController.createGradeAdmin)
 router.get('/logs',SuperAdminController.logs)
 router.post('/retrieveGrades',SuperAdminController.retrieveGrades)
 router.get('/getSections',SuperAdminController.getSections)
+router.get('/getCounts',SuperAdminController.getCounts)
 router.get('/resetAll',SuperAdminController.resetAll)
 
 module.exports = router

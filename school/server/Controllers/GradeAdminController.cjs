@@ -47,7 +47,7 @@ exports.verifyOTP = (req,res) => {
     const {from,otp} = req.body;
     console.log(from,otp)
     if(validateOTP(from,Number(otp))){
-        const token = jwt.sign({email:from},jwtsecret,{expiresIn: "2m"})
+        const token = jwt.sign({email:from},jwtsecret,{expiresIn: "50m"})
         console.log(token);
         return res.json({status:"success", token: token})
     }
@@ -837,6 +837,23 @@ exports.getStaffNames = async (req,res) => {
             list.push({email:i.email,section:i.section})
         }
         return res.json({status:"success",list})
+    }
+    catch(err){
+        console.log(err)
+        return res.json({status:"failure",message:"Something went wrong"})
+    }
+}
+
+exports.getCounts = async (req,res) => {
+    const {details} = req.body;
+    try{
+        const studentsCount = await Student.find({grade:details}).countDocuments()
+        const teachersCount = await Teacher.find({grade:details}).countDocuments()
+        const sectionsCount = await Section.find({grade:details}).countDocuments()
+        const subjectsCount = await Subject.find({
+            grade: { $in: details }
+        }).countDocuments()
+        return res.json({status:'success',countList:{studentsCount,teachersCount,subjectsCount,sectionsCount}})
     }
     catch(err){
         console.log(err)

@@ -41,9 +41,11 @@ const SuperAdminForgot = () => {
         }
     }
     return (
-        <div className='forgot-cont'>
-            <input type="email" placeholder='Enter your registered Email' onChange={(e)=>setEmail(e.target.value)} onKeyDown={(e)=>handleKey(e)}/>
-            <button onClick={sendLink}>Send Link</button>
+        <div style={{display:'flex',width:'100vw',height:'100vh',alignItems:'center',justifyContent:'center'}}>
+            <div className='dash-div' style={{padding:'20px',width:'30vw',display:'flex',justifyContent:'center',alignItems:'center'}}>
+                <input type="email" style={{width: '20vw'}} placeholder='Enter your registered Email' onChange={(e)=>setEmail(e.target.value)} onKeyDown={(e)=>handleKey(e)}/>
+                <button onClick={sendLink}>Send Link</button>
+            </div>
         </div>
     )
 }

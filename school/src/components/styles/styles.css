@@ -168,6 +168,9 @@
     margin: 1vw;
     box-shadow: 0 0 0.5rem silver;
 }
+.dash-div:hover{
+    box-shadow: 10px 0 1rem 1px rgb(247, 220, 220), -10px 0 2rem rgb(195, 195, 245);
+}
 .dash-div h1{
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     color: grey;

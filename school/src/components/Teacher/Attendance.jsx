@@ -22,6 +22,15 @@ const Attendance = () => {
     const [history, setHistory] = useState([])
     const [past,setPast] = useState([])
     const {socketConn} = useContext(ChatContext)
+    const [sampleDate,setSampleDate] = useState(null)
+
+    useEffect(()=>{
+        if(sampleDate===null) return
+        setCurrentYear(new Date(sampleDate).getFullYear())
+        setCurrentMonth(new Date(sampleDate).getMonth() + 1)
+        setCurrentDate(new Date(sampleDate).getDate())
+        setTotalDays(new Date(new Date(sampleDate).getFullYear(), new Date(sampleDate).getMonth() + 1, 0).getDate())
+    },[sampleDate])
 
     useEffect(() => {
         const getAttendanceData = async () => {
@@ -121,8 +130,6 @@ const Attendance = () => {
     }
 
     const isPresent = (day, roll) => {
-        console.log(roll)
-        console.log(day)
         for(let i of history){
             if(i.day == day){
                 return i.students.includes(roll)
@@ -185,6 +192,7 @@ const Attendance = () => {
             <h1 className='welcome-note'>Attendance</h1>
             <h2 className='welcome-note'>{currentDate} - {currentMonth} - {currentYear}</h2>
             <br />
+            <span style={{margin: '10px',fontFamily:'Poppins'}}>Go To Date : </span><input style={{padding:'3px',borderRadius:'7px',border: 'none',boxShadow:'0 0 10px silver',cursor:'pointer'}} type='date' onChange={e=>setSampleDate(e.target.value)}/>
             <table className='teacher-timetable' border="1" cellPadding="8" style={{ borderCollapse: 'collapse' }}>
                 <thead>
                     <tr>

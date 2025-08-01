@@ -45,7 +45,7 @@ const SuperAdminLink = () => {
     }
     return (
         <div className='forgot-cont'>
-            <h2>Set New Password</h2>
+            <h2 style={{fontFamily:'Poppins'}}>Set New Password</h2>
             <form className='link-form' onSubmit={changePassword}>
                 <input placeholder='email' value={email} disabled/>
                 <input placeholder='New Password' type="text" onChange={(e)=>setPassword(e.target.value)}/>

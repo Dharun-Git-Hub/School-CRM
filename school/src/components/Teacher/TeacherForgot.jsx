@@ -17,8 +17,10 @@ const TeacherForgot = () => {
                 })
                 const data = await response.json()
                 console.log(data)
-                if(data.status==='success')
+                if(data.status==='success'){
+                    alert('A New Password Link has been sent to your Email. Please Check out!')
                     navigate('/login-staff')
+                }
                 else{
                     alert(data.message)
                     return
@@ -34,9 +36,11 @@ const TeacherForgot = () => {
         }
     }
     return (
-        <div>
-            <input type="email" placeholder='Enter your registered Email' onChange={(e)=>setEmail(e.target.value)}/>
-            <button onClick={sendLink}>Send Link</button>
+        <div style={{display:'flex',width:'100vw',height:'100vh',alignItems:'center',justifyContent:'center'}}>
+            <div className='dash-div' style={{padding:'20px',width:'30vw',display:'flex',justifyContent:'center',alignItems:'center'}}>
+                <input type="email" style={{width: '20vw'}} placeholder='Enter your registered Email' onChange={(e)=>setEmail(e.target.value)} onKeyDown={(e)=>handleKey(e)}/>
+                <button onClick={sendLink}>Send Link</button>
+            </div>
         </div>
     )
 }

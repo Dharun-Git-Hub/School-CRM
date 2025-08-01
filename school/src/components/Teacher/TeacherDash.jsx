@@ -4,6 +4,8 @@ import { decryptRandom, encryptRandom } from '../../Security/Encryption'
 import TeacherTimetable from './TeacherTimetable'
 import StaffChatPanel from '../../Chat/StaffChatPanel'
 import { ChatContext } from '../../Context/ChatContext'
+import { useDispatch } from 'react-redux'
+import { ValidateStudent } from '../../slices/Login/LoginStudentSlice'
 
 const TeacherDash = ({socket}) => {
     const navigate = useNavigate()
@@ -14,6 +16,33 @@ const TeacherDash = ({socket}) => {
     useEffect(()=>{
         setSocketConn(socket)
     },[socket])
+
+    const dispatch = useDispatch()
+    
+    useEffect(()=>{
+        const doFirst = async() => {
+            if(sessionStorage.getItem('token')){
+                try{
+                    const userDetails = await dispatch(ValidateStudent(sessionStorage.getItem('token'))).unwrap()
+                    console.log(userDetails);
+                    if(userDetails === "Invalid" || userDetails === "Something went wrong!"){
+                        sessionStorage.removeItem('token')
+                        alert('Session Expired! Please Login again to continue!')
+                        sessionStorage.removeItem('email')
+                        sessionStorage.removeItem('token')
+                        navigate('/')
+                    }
+                }
+                catch(err){
+                    alert('Session Expired! Please Login again to continue!')
+                    sessionStorage.removeItem('email')
+                    sessionStorage.removeItem('token')
+                    navigate('/')
+                }
+            }
+        }
+        doFirst()
+    },[])
 
     useEffect(()=>{
         const getStaffInfo = async () => {

@@ -18,7 +18,7 @@ exports.login = async(req,res) => {
     const exists = await Student.findOne({email:decrypted.email, password: decrypted.password})
     if(!exists)
         return res.json({status:"failure",message: "Invalid Email or Password!"});
-    const token = jwt.sign({email:decrypted.email},jwtsecret,{expiresIn: "2m"})
+    const token = jwt.sign({email:decrypted.email},jwtsecret,{expiresIn: "50m"})
     await Logs.insertOne({action:`Student with email: ${decrypted.email} logged in !`,who: `Student with MailID: ${decrypted.email}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super","Grade"]})
     return res.json({status:"success",token:token})
 }

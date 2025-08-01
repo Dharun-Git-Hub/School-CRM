@@ -263,7 +263,7 @@ const GradeAdminPanel = ({ socket, grade }) => {
                         ...styles.toggleButton,
                         background: view === 'staff' ? 'linear-gradient(to right,blue,#ff2976)' : '#e6e6e6',
                         color: view === 'staff' ? 'white' : 'black',
-                        border: '1px solid black'
+                        border: '2px solid silver'
                     }}
                 >
                     Chat with Staff
@@ -332,7 +332,7 @@ const GradeAdminPanel = ({ socket, grade }) => {
                                 }}
                                 onClick={() => setSelectedStaff(name)}
                             >
-                                Grade {grade}-{namedStaff.find(el => el.email === name)?.section || name}
+                                Staff {grade}-{namedStaff.find(el => el.email === name)?.section || name}
                             </li>
                         ))}
                         

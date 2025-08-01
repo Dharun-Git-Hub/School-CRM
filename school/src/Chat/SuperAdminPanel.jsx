@@ -243,6 +243,7 @@ const SuperAdminPanel = ({socket}) => {
                                     <div key={idx} style={{...styles.messageItem,
                                     backgroundColor: msg.from === 'You' ? '#f7eefeff' : '#e1f5fe',
                                     position: 'relative',
+                                    fontSize: '0.9rem'
                                     }}>
                                         <strong>{msg.from}:</strong> {msg.message}
                                     </div>

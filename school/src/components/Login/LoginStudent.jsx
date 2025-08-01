@@ -18,11 +18,16 @@ const LoginStudent = () => {
                     if(userDetails === "Invalid" || userDetails === "Something went wrong!"){
                         sessionStorage.removeItem('token')
                         alert('Session Expired! Please Login again to continue!')
+                        sessionStorage.removeItem('email')
+                        sessionStorage.removeItem('token')
                         navigate('/')
                     }
                 }
                 catch(err){
-                    alert(err.message)
+                    alert('Session Expired! Please Login again to continue!')
+                    sessionStorage.removeItem('email')
+                    sessionStorage.removeItem('token')
+                    navigate('/')
                 }
             }
         }

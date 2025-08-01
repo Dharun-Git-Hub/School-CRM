@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { encryptRandom } from '../../Security/Encryption'
 import StudentChatPanel from '../../Chat/StudentChatPanel'
 import StudentTimetable from './StudentTimetable'
+import { ValidateStudent } from '../../slices/Login/LoginStudentSlice'
+import { useDispatch } from 'react-redux'
 
 const StudentDash = ({socket}) => {
     const location = useLocation()
@@ -11,6 +13,33 @@ const StudentDash = ({socket}) => {
     const [percent,setPercent] = useState(0)
     const [toMail,setToMail] = useState(null)
     console.log(details)
+
+    const dispatch = useDispatch()
+    
+    useEffect(()=>{
+        const doFirst = async() => {
+            if(sessionStorage.getItem('token')){
+                try{
+                    const userDetails = await dispatch(ValidateStudent(sessionStorage.getItem('token'))).unwrap()
+                    console.log(userDetails);
+                    if(userDetails === "Invalid" || userDetails === "Something went wrong!"){
+                        sessionStorage.removeItem('token')
+                        alert('Session Expired! Please Login again to continue!')
+                        sessionStorage.removeItem('email')
+                        sessionStorage.removeItem('token')
+                        navigate('/')
+                    }
+                }
+                catch(err){
+                    alert('Session Expired! Please Login again to continue!')
+                    sessionStorage.removeItem('email')
+                    sessionStorage.removeItem('token')
+                    navigate('/')
+                }
+            }
+        }
+        doFirst()
+    },[])
 
     useEffect(()=>{
         const getAttendance = async () => {

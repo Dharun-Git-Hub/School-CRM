@@ -7,9 +7,68 @@ import SuperAddGradeAdmin from './SuperAddGradeAdmin'
 import { useNavigate } from 'react-router-dom'
 import SuperAdminPanel from '../../Chat/SuperAdminPanel'
 import '../styles/styles.css'
+import { ValidateStudent } from '../../slices/Login/LoginStudentSlice'
+import { useDispatch } from 'react-redux'
 
 const SuperAdminDash = ({socket}) => {
     const navigate = useNavigate()
+    const [counts,setCounts] = useState(null)
+
+    const dispatch = useDispatch()
+
+    const CountsComponent = ({studentsCount,teachersCount,gradesCount,subjectsCount}) => {
+        return (
+            <div style={{position:'fixed', bottom:'2vh', left: '1vw', background:'white',padding: '10px',boxShadow: '0 0 5px silver',cursor: 'pointer',border: 'none',borderRadius:'10px',
+                display:'flex',gap:'10px',fontFamily:'Poppins',fontSize:'0.7rem'
+            }}>
+                <span>Students: {studentsCount}</span>
+                <span>Teachers: {teachersCount}</span>
+                <span>Grades: {gradesCount}</span>
+                <span>Subjects: {subjectsCount}</span>
+            </div>
+        )
+    }
+
+    useEffect(()=>{
+        const getCounts = async () => {
+            try{
+                const response = await fetch('http://localhost:3000/super/getCounts')
+                const data = await response.json()
+                console.log(data)
+                setCounts(data.countList)
+            }
+            catch(err){
+                console.log(err)
+                alert('Something went wrong')
+            }
+        }
+        getCounts()
+    },[])
+    
+    useEffect(()=>{
+        const doFirst = async() => {
+            if(sessionStorage.getItem('token')){
+                try{
+                    const userDetails = await dispatch(ValidateStudent(sessionStorage.getItem('token'))).unwrap()
+                    console.log(userDetails);
+                    if(userDetails === "Invalid" || userDetails === "Something went wrong!"){
+                        sessionStorage.removeItem('token')
+                        alert('Session Expired! Please Login again to continue!')
+                        sessionStorage.removeItem('email')
+                        sessionStorage.removeItem('token')
+                        navigate('/')
+                    }
+                }
+                catch(err){
+                    alert('Session Expired! Please Login again to continue!')
+                    sessionStorage.removeItem('email')
+                    sessionStorage.removeItem('token')
+                    navigate('/')
+                }
+            }
+        }
+        doFirst()
+    },[])
     
     const handleReset = async() => {
         const opt = confirm('Are you sure?')
@@ -54,6 +113,14 @@ const SuperAdminDash = ({socket}) => {
                 <SuperAdminStudent/>
                 <SuperAddGradeAdmin/>
                 {socket && <SuperAdminPanel socket={socket}/>}
+                {counts !== null && counts.hasOwnProperty('studentsCount') && 
+                <CountsComponent 
+                    studentsCount={counts.studentsCount}
+                    teachersCount={counts.teachersCount}
+                    gradesCount={counts.gradesCount}
+                    subjectsCount={counts.subjectsCount}
+                    />
+                }
             </div>
         </div>
     )

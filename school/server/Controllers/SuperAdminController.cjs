@@ -48,7 +48,7 @@ exports.verifyOTP = (req,res) => {
     const {from,otp} = req.body;
     console.log(from,otp)
     if(validateOTP(from,Number(otp))){
-        const token = jwt.sign({email:from},jwtsecret,{expiresIn: "2m"})
+        const token = jwt.sign({email:from},jwtsecret,{expiresIn: "50m"})
         console.log(token);
         return res.json({status:"success", token: token})
     }
@@ -720,5 +720,19 @@ exports.getSections = async (req,res) => {
     }
     catch(err){
         return res.json({status:"failure"})
+    }
+}
+
+exports.getCounts = async (req,res) => {
+    try{
+        const studentsCount = await Student.find({}).countDocuments()
+        const teachersCount = await Teacher.find({}).countDocuments()
+        const subjectsCount = await Subject.find({}).countDocuments()
+        const gradesCount = await Grade.find({}).countDocuments()
+        return res.json({status:'success',countList:{studentsCount,teachersCount,subjectsCount,gradesCount}})
+    }
+    catch(err){
+        console.log(err)
+        return res.json({status:"failure",message:'Something went wrong'})
     }
 }
