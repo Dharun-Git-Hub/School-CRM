@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.2",
+    "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
     "concurrently": "^9.2.0",
     "cors": "^2.8.5",
@@ -30,6 +31,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.6.3",
     "react-simple-wysiwyg": "^3.4.0",
+    "react-toastify": "^11.0.5",
     "redux": "^5.0.1",
     "uuid": "^11.1.0",
     "ws": "^8.18.3",
