@@ -736,3 +736,19 @@ exports.getCounts = async (req,res) => {
         return res.json({status:"failure",message:'Something went wrong'})
     }
 }
+
+exports.getOverview = async (req,res) => {
+    try{
+        const students = await Student.find({})
+        const teachers = await Teacher.find({})
+        const subjects = await Subject.find({})
+        const grades = await Grade.find({})
+        const sections = await Section.find({})
+        const gradeAdmins = await GradeAdmin.find({})
+        return res.json({status:'success',list:{students,teachers,subjects,grades,sections,gradeAdmins}})
+    }
+    catch(err){
+        console.log(err)
+        return res.json({status:"failure",message:'Something went wrong'})
+    }
+}

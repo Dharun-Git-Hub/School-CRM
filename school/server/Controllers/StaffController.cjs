@@ -2,6 +2,7 @@ const Student = require('../Schemas/Student/StudentSchema.cjs');
 const TeacherModel = require('../Schemas/Teacher/TeacherSchema.cjs')
 const Timetable = require('../Schemas/TimeTable/TimeTableSchema.cjs')
 const GradeAdmin = require('../Schemas/GradeAdmin/GradeAdminLoginSchema.cjs')
+const Subject = require('../Schemas/Subject/SubjectSchema.cjs')
 const Section = require('../Schemas/Section/SectionSchema.cjs')
 const Assignment = require('../Schemas/Assignment/AssignmentSchema.cjs')
 const { decryptRandom, encryptRandom } = require('../Helpers/Cryptors.cjs');
@@ -409,5 +410,19 @@ exports.loadGradeName = async (req,res) => {
     catch(err){
         console.log(err)
         return res.json({status:"failure",message:"Something went wrong!"})
+    }
+}
+
+exports.getOverview = async (req,res) => {
+    try{
+        const {grade,section} = req.body;
+        const students = await Student.find({grade,section})
+        const subjects = await Subject.find({grade:{$in:grade}})
+        const sections = await Section.find({grade,name: section})
+        return res.json({status:'success',list:{students,subjects,sections}})
+    }
+    catch(err){
+        console.log(err)
+        return res.json({status:"failure",message:'Something went wrong'})
     }
 }

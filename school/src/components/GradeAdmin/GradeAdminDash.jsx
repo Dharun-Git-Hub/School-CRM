@@ -25,6 +25,7 @@ const GradeAdminDash = ({socket}) => {
                 <span>Teachers: {teachersCount}</span>
                 <span>Sections: {sectionsCount}</span>
                 <span>Subjects: {subjectsCount}</span>
+                {myGrade && <i title='Overview' className='bx bx-bell' style={{fontSize:'0.8rem',color:'#ff2976'}} onClick={()=>navigate('grade-overview',{state:myGrade})}></i>}
             </div>
         )
     }

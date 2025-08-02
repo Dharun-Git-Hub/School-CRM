@@ -29,6 +29,9 @@ import SuperLogs from './components/SuperAdmin/SuperLogs'
 import { useEffect, useRef, useState } from 'react'
 import { ChatProvider } from './Context/ChatContext'
 import NotificationDisplay from './Context/NotificationDisplay'
+import Overview from './components/SuperAdmin/Overview'
+import GradeOverview from './components/GradeAdmin/GradeOverview'
+import StaffOverview from './components/Teacher/StaffOverview'
 
 
 const App = () => {
@@ -86,6 +89,9 @@ const App = () => {
             <Route path='/assignments-student' element={<Assignments/>}/>
             <Route path="/grade-logs" element={<GradeLogs/>}/>
             <Route path="/super-logs" element={<SuperLogs/>}/>
+            <Route path='/super-admin-dash/super-overview' element={<Overview/>}/>
+            <Route path='/grade-admin-dash/grade-overview' element={<GradeOverview/>}/>
+            <Route path='/staff-dash/staff-overview' element={<StaffOverview/>}/>
             <Route path='*' element={<NotFound/>}/>
           </Routes>
           <NotificationDisplay/>

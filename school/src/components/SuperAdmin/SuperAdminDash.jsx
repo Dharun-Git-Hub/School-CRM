@@ -25,6 +25,7 @@ const SuperAdminDash = ({socket}) => {
                 <span>Teachers: {teachersCount}</span>
                 <span>Grades: {gradesCount}</span>
                 <span>Subjects: {subjectsCount}</span>
+                <i title='Overview' className='bx bx-bell' style={{fontSize:'0.8rem',color:'#ff2976'}} onClick={()=>navigate('super-overview')}></i>
             </div>
         )
     }

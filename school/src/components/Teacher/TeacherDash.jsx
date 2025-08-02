@@ -125,6 +125,11 @@ const TeacherDash = ({socket}) => {
                     <TeacherTimetable details={{gradeId:staffDetails.grade,sectionId:staffDetails.section,academicYear:"2025-00-00",name: staffDetails.name, subject: staffDetails.subject}}/>
                 }
                 {staffDetails.hasOwnProperty('grade') && <StaffChatPanel socket={socket} gradeFromLogin={staffDetails.grade} sectionFromLogin={staffDetails.section} myMail={staffDetails.email}/>}
+                <div style={{position:'fixed', bottom:'2vh', left: '1vw', background:'white',padding: '10px',boxShadow: '0 0 5px silver',cursor: 'pointer',border: 'none',borderRadius:'10px',
+                    display:'flex',gap:'10px',fontFamily:'Poppins',fontSize:'0.7rem'
+                }}>
+                    {staffDetails.hasOwnProperty('grade') && staffDetails.hasOwnProperty('grade') && <i title='Overview' className='bx bx-bell' style={{fontSize:'0.8rem',color:'#ff2976',fontFamily:'Poppins'}} onClick={()=>navigate('staff-overview',{state:{myGrade: staffDetails.grade, mySection: staffDetails.section}})}>Overview</i>}
+                </div>
             </div>
         </div>
     )

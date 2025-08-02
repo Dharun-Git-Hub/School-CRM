@@ -860,3 +860,19 @@ exports.getCounts = async (req,res) => {
         return res.json({status:"failure",message:"Something went wrong"})
     }
 }
+
+exports.getOverview = async (req,res) => {
+    try{
+        const {grade} = req.body;
+        const students = await Student.find({grade})
+        const teachers = await Teacher.find({grade})
+        const subjects = await Subject.find({grade:{$in:grade}})
+        const grades = await Grade.find({grade})
+        const sections = await Section.find({grade})
+        return res.json({status:'success',list:{students,teachers,subjects,grades,sections}})
+    }
+    catch(err){
+        console.log(err)
+        return res.json({status:"failure",message:'Something went wrong'})
+    }
+}
