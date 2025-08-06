@@ -21,7 +21,7 @@ const sendOTP = async(to) => {
         }
     })
     const mailOptions = {
-        from: 'ganeshgowri1985@gmail.com',
+        from: 'XXXXXXXXXXXXXX',
         text: `3 Minutes OTP for Schools : ${otp} ! Hurry up!`,
         to: to,
     }
@@ -62,7 +62,7 @@ const sendForgotLink = async(email,id,loc) => {
         }
     })
     const mailOptions = {
-        from: 'ganeshgowri1985@gmail.com',
+        from: 'XXXXXXXXXXXXXXXXX',
         text: `http://localhost:5173/${loc}/${id.toString().replaceAll('/',')')}/${email.toString().replaceAll('/',')')}`,
         to: email,
     }
@@ -76,5 +76,6 @@ const sendForgotLink = async(email,id,loc) => {
         console.log(`http://localhost:5173/${loc}/${id.toString().replaceAll('/',')')}/${email.toString().replaceAll('/',')')}`)
     }
 }
+
 
 module.exports = {sendOTP, validateOTP, generateID, sendForgotLink}
