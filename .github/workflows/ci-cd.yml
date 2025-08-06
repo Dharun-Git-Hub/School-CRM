@@ -16,3 +16,4 @@ jobs:
   
       - name: Run App
         run: npm test
+        working-directory: './school'
