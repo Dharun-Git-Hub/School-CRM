@@ -1,5 +1,5 @@
 import School from './School.jpg'
-import Garden from './Garden.webp'
+import Garden from './garden.webp'
 import Notification from './notification.mp3'
 
 export const assets = {
@@ -7,5 +7,6 @@ export const assets = {
     Garden,
     Notification,
 }
+
 
 export default assets
