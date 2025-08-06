@@ -14,3 +14,11 @@ jobs:
   
       - name: Install dependencies
         run: npm install
+        
+      - name: Run App
+        run: npm test
+        working-directory: './school'
+        
+      - name: Run Build the App
+        run: npm run build
+        working-directory: './school'
