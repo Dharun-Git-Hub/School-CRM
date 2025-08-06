@@ -32,7 +32,7 @@ const Field = ({gradeList,fieldIndex, fieldData, updateField, removeField, canRe
             <input placeholder='Subject Name' value={subjectName} onChange={e => setSubjectName(e.target.value)}/>
             <input placeholder='Subject Code' value={subjectCode} onChange={e => setSubjectCode(e.target.value)}/>
             <div style={{margin: '10px 0'}}>
-                {grades.map((grade, index)=>(
+                {grades.sort().map((grade, index)=>(
                     <label key={index}> {grade}
                         <input type="checkbox" value={grade} checked={selected.includes(grade)} onChange={() => addGrade(grade)}/>
                     </label>

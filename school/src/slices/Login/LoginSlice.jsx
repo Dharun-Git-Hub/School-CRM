@@ -28,12 +28,12 @@ export const ValidateSuperAdmin = createAsyncThunk('login/ValidateSuperAdmin',as
         console.log(token)
         const response = await fetch('http://localhost:3000/super/validateToken',{
             method: 'POST',
-            headers: {'Content-Type':'application/json'},
+            headers: {'Content-Type':'application/json','key':'auth_key'},
             body: JSON.stringify({token: encryptRandom(token)})
         })
         const data = await response.json();
         console.log(data)
-        return data.status === 'success' ? {details: JSON.parse(decryptRandom(data.userDetails))} : rejectWithValue("Invalid")
+        return data.status === 'success' ? {details: JSON.parse(decryptRandom(data.userDetails))} : rejectWithValue("Invalid OTP or Unauthorized!")
     }
     catch(err){
         return rejectWithValue("Something went wrong!")

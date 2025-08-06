@@ -1,14 +1,129 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, createElement } from 'react'
 import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify'
+import { encryptRandom } from '../../Security/Encryption'
 
 const Overview = () => {
     const [subjects,setSubjects] = useState([])
     const [grades,setGrades] = useState([])
     const [staff,setStaff] = useState([])
     const [students,setStudents] = useState([])
-    const [sections,setSections] = useState([])
     const [gradeAdmins,setGradeAdmins] = useState([])
+    const [view,setView] = useState('gradeadmin')
+
+    const [gradeAdminSkip,setGradeAdminSkip] = useState(0)
+    const [gradeAdminCurrent,setGradeAdminCurrent] = useState(2)
+    const [gradeSkip,setGradeSkip] = useState(0)
+    const [gradeCurrent,setGradeCurrent] = useState(2)
+    const [staffSkip,setStaffSkip] = useState(0)
+    const [staffCurrent,setStaffCurrent] = useState(2)
+    const [studentSkip,setStudentSkip] = useState(0)
+    const [studentCurrent,setStudentCurrent] = useState(2)
+    const [subjectSkip,setSubjectSkip] = useState(0)
+    const [subjectCurrent,setSubjectCurrent] = useState(2)
+
+    const [gradeAdminPage, setGradeAdminPage] = useState(1);
+    const [gradePage, setGradePage] = useState(1);
+    const [staffPage, setStaffPage] = useState(1);
+    const [studentPage, setStudentPage] = useState(1);
+    const [subjectPage, setSubjectPage] = useState(1);
+
+
+    const getOverGradeAdmins = async () => {
+        try{
+            const temp = encryptRandom(JSON.stringify({skip:gradeAdminSkip,limit:gradeAdminCurrent}))
+            const response = await axios.post('http://localhost:3000/super/getOverGradeAdmins',{
+                details: temp
+            })
+            console.log(response.data)
+            setGradeAdmins(prev => prev.length !== 0 ? [...response.data.list] : response.data.list)
+            if(response.data.list.length===0){
+                setGradeAdminPage(prev=>prev-1)
+                alert('That\'s it')
+            }
+        }
+        catch(err){
+            console.log(err)
+            alert('Something went wrong!')
+        }
+    }
+
+    const getOverStudents = async () => {
+        try{
+            const temp = encryptRandom(JSON.stringify({skip:studentSkip,limit:studentCurrent}))
+            const response = await axios.post('http://localhost:3000/super/getOverStudents',{
+                details: temp
+            })
+            console.log(response.data)
+            setStudents(prev => prev.length !== 0 ? [...response.data.list] : response.data.list)
+            if(response.data.list.length===0){
+                setStudentPage(prev=>prev-1)
+                console.log(studentPage)
+                alert('That\'s it')
+            }
+        }
+        catch(err){
+            console.log(err)
+            alert('Something went wrong!')
+        }
+    }
+
+    const getOverTeachers = async () => {
+        try{
+            const temp = encryptRandom(JSON.stringify({skip:staffSkip,limit:staffCurrent}))
+            const response = await axios.post('http://localhost:3000/super/getOverTeachers',{
+                details: temp
+            })
+            console.log(response.data)
+            setStaff(prev => prev.length !== 0 ? [...response.data.list] : response.data.list)
+            if(response.data.list.length===0){
+                setStaffPage(prev=>prev-1)
+                alert('That\'s it')
+            }
+        }
+        catch(err){
+            console.log(err)
+            alert('Something went wrong!')
+        }
+    }
+
+    const getOverSubjects = async () => {
+        try{
+            const temp = encryptRandom(JSON.stringify({skip:subjectSkip,limit:subjectCurrent}))
+            const response = await axios.post('http://localhost:3000/super/getOverSubjects',{
+                details: temp
+            })
+            console.log(response.data)
+            setSubjects(prev => prev.length !== 0 ? [...response.data.list] : response.data.list)
+            if(response.data.list.length===0){
+                setSubjectPage(prev=>prev-1)
+                alert('That\'s it')
+            }
+        }
+        catch(err){
+            console.log(err)
+            alert('Something went wrong!')
+        }
+    }
+
+    const getOverGrades = async () => {
+        try{
+            const temp = encryptRandom(JSON.stringify({skip:gradeSkip,limit:gradeCurrent}))
+            const response = await axios.post('http://localhost:3000/super/getOverGrades',{
+                details: temp
+            })
+            console.log(response.data)
+            setGrades(prev => prev.length !== 0 ? [...response.data.list] : response.data.list)
+            if(response.data.list.length===0){
+                setGradePage(prev=>prev-1)
+                alert('That\'s it')
+            }
+        }
+        catch(err){
+            console.log(err)
+            toast.error('Something went wrong!')
+        }
+    }
 
     const handleClick = (email) => {
         navigator.clipboard.writeText(email)
@@ -16,26 +131,183 @@ const Overview = () => {
     }
 
     useEffect(()=>{
-        const doFirst = async () => {
-            try{
-                const response = await axios.get('http://localhost:3000/super/getOverview');
-                console.log(response.data)
-                if(response.data.hasOwnProperty('list')){
-                    setSubjects(response.data.list.subjects)
-                    setGrades(response.data.list.grades)
-                    setStaff(response.data.list.teachers)
-                    setStudents(response.data.list.students)
-                    setSections(response.data.list.sections)
-                    setGradeAdmins(response.data.list.gradeAdmins)
-                }
-            }
-            catch(err){
-                console.log(err)
-                alert('Something went wrong!')
-            }
+        getOverGradeAdmins()
+    },[gradeAdminCurrent,gradeAdminSkip])
+    useEffect(()=>{
+        getOverGrades()
+    },[gradeCurrent,gradeSkip])
+    useEffect(()=>{
+        getOverTeachers()
+    },[staffCurrent,staffSkip])
+    useEffect(()=>{
+        getOverStudents()
+    },[studentCurrent,studentSkip])
+    useEffect(()=>{
+        getOverSubjects()
+    },[subjectCurrent,subjectSkip])
+
+    const handleGradeAdmin = async (val = 1) => {
+        let newPage = gradeAdminPage;
+        let newSkip = gradeAdminSkip;
+        if(val === -1 && gradeAdminPage-1 <= 0)
+            return;
+        if(val === -1){
+            newPage = gradeAdminPage - 1;
+            newSkip = gradeAdminSkip - gradeAdminCurrent;
         }
-        doFirst()
-    },[])
+        else{
+            newPage = gradeAdminPage + 1;
+            newSkip = gradeAdminSkip + gradeAdminCurrent;
+        }
+        const temp = encryptRandom(JSON.stringify({skip:newSkip,limit:gradeAdminCurrent}));
+        try{
+            const response = await axios.post('http://localhost:3000/super/getOverGradeAdmins',{
+                details: temp
+            });
+            if(response.data.list.length===0){
+                toast.info("That's it!");
+                return;
+            }
+            setGradeAdmins(response.data.list);
+            setGradeAdminPage(newPage);
+            setGradeAdminSkip(newSkip);
+
+        }
+        catch(err){
+            console.error(err);
+            toast.error("Something went wrong!");
+        }
+    };
+
+    const handleGrade = async (val = 1) => {
+        let newPage = gradePage;
+        let newSkip = gradeSkip;
+        if(val === -1 && gradePage-1 <= 0)
+            return;
+        if(val === -1){
+            newPage = gradePage - 1;
+            newSkip = gradeSkip - gradeCurrent;
+        }
+        else{
+            newPage = gradePage + 1;
+            newSkip = gradeSkip + gradeCurrent;
+        }
+        const temp = encryptRandom(JSON.stringify({skip:newSkip,limit:gradeCurrent}));
+        try{
+            const response = await axios.post('http://localhost:3000/super/getOverGrades',{
+                details: temp
+            });
+            if(response.data.list.length===0){
+                toast.info("That's it!");
+                return;
+            }
+            setGrades(response.data.list);
+            setGradePage(newPage);
+            setGradeSkip(newSkip);
+
+        }
+        catch(err){
+            console.error(err);
+            toast.error("Something went wrong!");
+        }
+    };
+
+    const handleStaff = async (val = 1) => {
+        let newPage = staffPage;
+        let newSkip = staffSkip;
+        if(val === -1 && staffPage-1 <= 0)
+            return;
+        if(val === -1){
+            newPage = staffPage - 1;
+            newSkip = staffSkip - staffCurrent;
+        }
+        else{
+            newPage = staffPage + 1;
+            newSkip = staffSkip + staffCurrent;
+        }
+        const temp = encryptRandom(JSON.stringify({skip:newSkip,limit:staffCurrent}));
+        try{
+            const response = await axios.post('http://localhost:3000/super/getOverTeachers',{
+                details: temp
+            });
+            if(response.data.list.length===0){
+                toast.info("That's it!");
+                return;
+            }
+            setStaff(response.data.list);
+            setStaffPage(newPage);
+            setStaffSkip(newSkip);
+        }
+        catch(err){
+            console.error(err);
+            toast.error("Something went wrong!");
+        }
+    };
+
+    const handleStudent = async (val = 1) => {
+        let newPage = studentPage;
+        let newSkip = studentSkip;
+        if(val === -1 && studentPage-1 <= 0)
+            return;
+        if(val === -1){
+            newPage = studentPage - 1;
+            newSkip = studentSkip - studentCurrent;
+        }
+        else{
+            newPage = studentPage + 1;
+            newSkip = studentSkip + studentCurrent;
+        }
+        const temp = encryptRandom(JSON.stringify({skip:newSkip,limit:studentCurrent}));
+        try{
+            const response = await axios.post('http://localhost:3000/super/getOverStudents',{
+                details: temp
+            });
+            if(response.data.list.length===0){
+                toast.info("That's it!");
+                return;
+            }
+            setStudents(response.data.list);
+            setStudentPage(newPage);
+            setStudentSkip(newSkip);
+
+        }
+        catch(err){
+            console.error(err);
+            toast.error("Something went wrong!");
+        }
+    };
+
+    const handleSubject = async (val = 1) => {
+        let newPage = subjectPage;
+        let newSkip = subjectSkip;
+        if(val === -1 && subjectPage-1 <= 0)
+            return;
+        if(val === -1){
+            newPage = subjectPage - 1;
+            newSkip = subjectSkip - subjectCurrent;
+        }
+        else{
+            newPage = subjectPage + 1;
+            newSkip = subjectSkip + subjectCurrent;
+        }
+        const temp = encryptRandom(JSON.stringify({skip:newSkip,limit:subjectCurrent}));
+        try{
+            const response = await axios.post('http://localhost:3000/super/getOverSubjects',{
+                details: temp
+            });
+            if(response.data.list.length===0){
+                toast.info("That's it!");
+                return;
+            }
+            setSubjects(response.data.list);
+            setSubjectPage(newPage);
+            setSubjectSkip(newSkip);
+        }
+        catch(err){
+            console.error(err);
+            toast.error("Something went wrong!");
+        }
+    };
 
     const alertPanel = async () => {
         alert((await navigator.clipboard.readText(0)))
@@ -43,14 +315,16 @@ const Overview = () => {
 
     return (
         <div>
-            <div className='float-btn2' style={{boxShadow: 'none',background: 'transparent',position:'fixed',borderRadius:'0',width:'fit-content',display:'flex',flexDirection:'column',bottom: '2vw'}}>
-                <button onClick={()=>{const sub = document.getElementById('grade-admin-note');sub.scrollIntoView({behavior:'smooth',block:'start',inline:'start'})}}>GradeAdmin</button>
-                <button onClick={()=>{const sub = document.getElementById('grade-note');sub.scrollIntoView({behavior:'smooth',block:'start',inline:'start'})}}>Grades</button>
-                <button onClick={()=>{const sub = document.getElementById('staff-note');sub.scrollIntoView({behavior:'smooth',block:'start',inline:'start'})}}>Staff</button>
-                <button onClick={()=>{const sub = document.getElementById('student-note');sub.scrollIntoView({behavior:'smooth',block:'start',inline:'start'})}}>Students</button>
-                <button onClick={()=>{const sub = document.getElementById('subject-note');sub.scrollIntoView({behavior:'smooth',block:'start',inline:'start'})}}>Subjects</button>
+            <div className='float-btn2' style={{borderRadius:'0',display:'flex',flexDirection:'column'}}>
+                <button className={view === 'gradeadmin'?'float-btn-selected': 'float-btn-not-selected'} onClick={()=>{setView('gradeadmin');}}>GradeAdmin</button>
+                <button className={view === 'grade'?'float-btn-selected': 'float-btn-not-selected'} onClick={()=>{setView('grade');}}>Grades</button>
+                <button className={view === 'staff'?'float-btn-selected': 'float-btn-not-selected'} onClick={()=>{setView('staff');}}>Staff</button>
+                <button className={view === 'student'?'float-btn-selected': 'float-btn-not-selected'} onClick={()=>{setView('student');}}>Students</button>
+                <button className={view === 'subject'?'float-btn-selected': 'float-btn-not-selected'} onClick={()=>{setView('subject');}}>Subjects</button>
             </div>
-           
+           <div className='secondary'>
+            { view === 'gradeadmin' && 
+            <>
             <span className='welcome-note' id='grade-admin-note'>Grade Admins</span>
             <table style={{width: 'fit-content',borderRadius:'10px', boxShadow:'0 0 13px silver'}} className='teacher-timetable2'>
                 <thead>
@@ -70,6 +344,13 @@ const Overview = () => {
                     }
                 </tbody>
             </table>
+            <button title="Previous" className='loader' onClick={()=>handleGradeAdmin(-1)}><i className='bx bx-arrow-back'></i></button>
+            <span className='page-no'>{gradeAdminPage}</span>
+            <button title='Next' className='loader' onClick={()=>handleGradeAdmin()}><i style={{transform: 'rotate(180deg)'}} className='bx bx-arrow-back'></i></button>
+            </>
+            }
+            {view === 'staff' && 
+            <>
             <span className='welcome-note' id='staff-note'>Staff</span>
             <table style={{width: 'fit-content',borderRadius:'10px', boxShadow:'0 0 13px silver'}}  className='teacher-timetable2'>
                 <thead>
@@ -97,7 +378,15 @@ const Overview = () => {
                     }
                 </tbody>
             </table>
-            <span className='welcome-note' id='student-note'>Students</span>
+            <button title="Previous" className='loader' onClick={()=>handleStaff(-1)}><i className='bx bx-arrow-back'></i></button>
+            <span className="page-no">{staffPage}</span>
+            <button title='Next' className='loader' onClick={()=>handleStaff()}><i style={{transform: 'rotate(180deg)'}} className='bx bx-arrow-back'></i></button>
+            </>
+            }
+            {
+                view === 'student' && 
+                <>
+                <span className='welcome-note' id='student-note'>Students</span>
             <table style={{width: 'fit-content',borderRadius:'10px', boxShadow:'0 0 13px silver'}}  className='teacher-timetable2'>
                 <thead>
                     <tr>
@@ -128,7 +417,14 @@ const Overview = () => {
                     }
                 </tbody>
             </table>
-            <span className='welcome-note' id='grade-note'>Grades</span>
+            <button title="Previous" className='loader' onClick={()=>handleStudent(-1)}><i className='bx bx-arrow-back'></i></button>
+            <span className="page-no">{studentPage}</span>
+            <button title='Next' className='loader' onClick={()=>handleStudent()}><i style={{transform: 'rotate(180deg)'}} className='bx bx-arrow-back'></i></button>
+            </>
+            }
+            { view === 'grade' &&
+                <>
+                <span className='welcome-note' id='grade-note'>Grades</span>
             <table style={{width: 'fit-content',borderRadius:'10px', boxShadow:'0 0 13px silver'}}  className='teacher-timetable2'>
                 <thead>
                     <tr>
@@ -147,28 +443,14 @@ const Overview = () => {
                     }
                 </tbody>
             </table>
-            <span className='welcome-note'>Sections</span>
-            <table style={{width: 'fit-content',borderRadius:'10px', boxShadow:'0 0 13px silver'}}  className='teacher-timetable2'>
-                <thead>
-                    <tr>
-                        <th>Grade</th>
-                        <th>Section</th>
-                        <th>Students</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {
-                        sections.map((el,index)=>(
-                            <tr key={index}>
-                                <td>{el.grade}</td>
-                                <td>{el.name}</td>
-                                <td style={{overflow:'scroll'}}>{el.students.map(e=>(e.name+", "))}</td>
-                            </tr>
-                        ))
-                    }
-                </tbody>
-            </table>
-            <span className='welcome-note' id="subject-note">Subjects</span>
+            <button title="Previous" className='loader' onClick={()=>handleGrade(-1)}><i className='bx bx-arrow-back'></i></button>
+            <span className="page-no">{gradePage}</span>
+            <button title='Next' className='loader' onClick={()=>handleGrade()}><i style={{transform: 'rotate(180deg)'}} className='bx bx-arrow-back'></i></button>
+            </>
+            }
+            { view === 'subject' &&
+                <>
+                <span className='welcome-note' id="subject-note">Subjects</span>
             <table style={{width: 'fit-content',borderRadius:'10px', boxShadow:'0 0 13px silver'}}  className='teacher-timetable2'>
                 <thead>
                     <tr>
@@ -189,7 +471,14 @@ const Overview = () => {
                     }
                 </tbody>
             </table>
-            <ToastContainer position='bottom-center' toastStyle={{background:'rgba(1,1,1,0.05)', color:'#333'}} onClick={alertPanel}/>
+            <button title="Previous" className='loader' onClick={()=>handleSubject(-1)}><i className='bx bx-arrow-back'></i></button>
+            <span className="page-no">{subjectPage}</span>
+            <button title='Next' className='loader' onClick={()=>handleSubject()}><i style={{transform: 'rotate(180deg)'}} className='bx bx-arrow-back'></i></button>
+            </>
+            }
+           </div>
+           
+            <ToastContainer position='top-center' toastStyle={{background:'rgba(1,1,1,0.9)', color:'#fff'}} onClick={alertPanel} autoClose={100}/>
         </div>
     )
 }

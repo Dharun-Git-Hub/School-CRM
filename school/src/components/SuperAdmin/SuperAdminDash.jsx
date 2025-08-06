@@ -67,6 +67,10 @@ const SuperAdminDash = ({socket}) => {
                     navigate('/')
                 }
             }
+            else{
+                alert('Login First to Continue')
+                navigate('/')
+            }
         }
         doFirst()
     },[])

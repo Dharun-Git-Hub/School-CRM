@@ -218,7 +218,7 @@ const Attendance = () => {
                 <tbody>
                     {details.studentList?.sort((a,b)=>a.roll-b.roll).map((student, index) => (
                         <tr key={index}>
-                            <td>{student.name}</td>
+                            <td style={{color:'black'}}>{student.roll}</td>
                             {days.map((day) => {
                                 const isLocked = isDateLocked(currentYear, currentMonth, day)
                                 return (

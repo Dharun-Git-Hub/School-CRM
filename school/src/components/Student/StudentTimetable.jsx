@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { encryptRandom } from "../../Security/Encryption";
+import { ToastContainer,toast } from "react-toastify";
 
 const StudentTimetable = ({details}) => {
     const [openform, setOpenForm] = useState(false);
@@ -53,9 +54,13 @@ const StudentTimetable = ({details}) => {
         );
     };
 
+    const handleToast = (txt) => {
+        if(txt.trim() === '') return
+        toast(txt)
+    }
+
     return (
         <div style={{ padding: "20px", fontFamily: 'Poppins' }}>
-            <h1>Timetable</h1>
             <h2 style={{color: 'gr#333ey',fontSize: '1.2rem'}}>Grade:</h2>{details.grade}
             <h3>Section: {details.section}</h3>
             
@@ -79,8 +84,11 @@ const StudentTimetable = ({details}) => {
                                             minWidth: "120px",
                                             width: '150px',
                                         }}
+                                        onClick={()=>handleToast(detailsSlot !== undefined ?
+                                            `${detailsSlot.timeslots?.teacher} - ${detailsSlot.timeslots?.subject}\n${detailsSlot.timeslots?.startTime} - ${detailsSlot.timeslots?.endTime}`
+                                            : '')}
                                         title={
-                                            detailsSlot ?
+                                            detailsSlot !== undefined ?
                                             `${detailsSlot.timeslots?.teacher} - ${detailsSlot.timeslots?.subject}\n${detailsSlot.timeslots?.startTime} - ${detailsSlot.timeslots?.endTime}`
                                             : ''
                                         }>
@@ -97,6 +105,7 @@ const StudentTimetable = ({details}) => {
                     ))}
                 </tbody>
             </table>
+            <ToastContainer position="bottom-center" toastStyle={{background:'#1f1f1f',color:'#fff'}} closeButton={false}/>
         </div>
     );
 };

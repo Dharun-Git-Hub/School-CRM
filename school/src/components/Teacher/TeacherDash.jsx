@@ -128,7 +128,12 @@ const TeacherDash = ({socket}) => {
                 <div style={{position:'fixed', bottom:'2vh', left: '1vw', background:'white',padding: '10px',boxShadow: '0 0 5px silver',cursor: 'pointer',border: 'none',borderRadius:'10px',
                     display:'flex',gap:'10px',fontFamily:'Poppins',fontSize:'0.7rem'
                 }}>
-                    {staffDetails.hasOwnProperty('grade') && staffDetails.hasOwnProperty('grade') && <i title='Overview' className='bx bx-bell' style={{fontSize:'0.8rem',color:'#ff2976',fontFamily:'Poppins'}} onClick={()=>navigate('staff-overview',{state:{myGrade: staffDetails.grade, mySection: staffDetails.section}})}>Overview</i>}
+                    {staffDetails.hasOwnProperty('grade') && staffDetails.hasOwnProperty('grade') && 
+                    <>
+                        <i title='Overview' id='shake' className='bx bx-bell' style={{fontSize:'0.8rem',color:'#ff2976',fontFamily:'Poppins'}} onClick={()=>navigate('staff-overview',{state:{myGrade: staffDetails.grade, mySection: staffDetails.section}})}><span style={{fontFamily:'Poppins',marginLeft:'5px'}}>Overview</span></i>
+                        <button title="See Students" style={{background:'transparent', border: 'none', cursor: 'pointer'}} onClick={()=>navigate('students-listed',{state:{section: staffDetails.section,grade: staffDetails.grade}})}>Students</button>
+                    </>
+                    }
                 </div>
             </div>
         </div>

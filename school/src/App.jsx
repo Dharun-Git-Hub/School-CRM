@@ -32,6 +32,8 @@ import NotificationDisplay from './Context/NotificationDisplay'
 import Overview from './components/SuperAdmin/Overview'
 import GradeOverview from './components/GradeAdmin/GradeOverview'
 import StaffOverview from './components/Teacher/StaffOverview'
+import StudentsList from './components/Teacher/StudentsList'
+import Protected from './Protected'
 
 
 const App = () => {
@@ -68,30 +70,33 @@ const App = () => {
             <Route path='/login-grade' element={<LoginGrade/>}/>
             <Route path='/login-staff' element={<LoginTeacher/>}/>
             <Route path='/login-student' element={<LoginStudent/>}/>
-            <Route path='/super-admin-dash' element={<SuperAdminDash socket={socketRef.current}/>}/>
-            <Route path='/super-admin-forgot' element={<SuperAdminForgot/>}/>
-            <Route path='/super-admin-link/:id/:email' element={<SuperAdminLink/>}/>
-            <Route path='/super-subject' element={<SuperSubject/>}/>
-            <Route path='/grade-admin-dash' element={<GradeAdminDash socket={socketRef.current}/>}/>
             <Route path='/grade-admin-forgot' element={<GradeAdminForgot/>}/>
             <Route path='/grade-admin-link/:id/:email' element={<GradeAdminLink/>}/>
-            <Route path='/staff-dash' element={<TeacherDash socket={socketRef.current}/>}/>
+            <Route path='/super-admin-forgot' element={<SuperAdminForgot/>}/>
+            <Route path='/super-admin-link/:id/:email' element={<SuperAdminLink/>}/>
             <Route path='/teacher-forgot' element={<TeacherForgot/>}/>
             <Route path="/staff-link/:id/:email" element={<TeacherLink/>}/>
-            <Route path='/student-dash' element={<StudentDash socket={socketRef.current}/>}/>
             <Route path='/student-forgot' element={<StudentForgot/>}/>
             <Route path='/student-link/:id/:email' element={<StudentLink/>}/>
-            <Route path='/grade-timeslots' element={<GradeTimeSlots/>}/>
-            <Route path='/timetable' element={<Timetable/>}/>
-            <Route path='/attendance' element={<Attendance/>}/>
-            <Route path='/post-assignment' element={<PostAssignment/>}/>
-            <Route path='/assignment-panel' element={<AssignmentPanel/>}/>
-            <Route path='/assignments-student' element={<Assignments/>}/>
-            <Route path="/grade-logs" element={<GradeLogs/>}/>
-            <Route path="/super-logs" element={<SuperLogs/>}/>
-            <Route path='/super-admin-dash/super-overview' element={<Overview/>}/>
-            <Route path='/grade-admin-dash/grade-overview' element={<GradeOverview/>}/>
-            <Route path='/staff-dash/staff-overview' element={<StaffOverview/>}/>
+            <Route element={<Protected/>}>
+                <Route path='/super-admin-dash' element={<SuperAdminDash socket={socketRef.current}/>}/>
+                <Route path='/super-subject' element={<SuperSubject/>}/>
+                <Route path='/grade-admin-dash' element={<GradeAdminDash socket={socketRef.current}/>}/>
+                <Route path='/staff-dash' element={<TeacherDash socket={socketRef.current}/>}/>
+                <Route path='/student-dash' element={<StudentDash socket={socketRef.current}/>}/>
+                <Route path='/grade-timeslots' element={<GradeTimeSlots/>}/>
+                <Route path='/timetable' element={<Timetable/>}/>
+                <Route path='/attendance' element={<Attendance/>}/>
+                <Route path='/post-assignment' element={<PostAssignment/>}/>
+                <Route path='/assignment-panel' element={<AssignmentPanel/>}/>
+                <Route path='/assignments-student' element={<Assignments/>}/>
+                <Route path="/grade-logs" element={<GradeLogs/>}/>
+                <Route path="/super-logs" element={<SuperLogs/>}/>
+                <Route path='/super-admin-dash/super-overview' element={<Overview/>}/>
+                <Route path='/grade-admin-dash/grade-overview' element={<GradeOverview/>}/>
+                <Route path='/staff-dash/staff-overview' element={<StaffOverview/>}/>
+                <Route path='/staff-dash/students-listed' element={<StudentsList/>}/>
+            </Route>
             <Route path='*' element={<NotFound/>}/>
           </Routes>
           <NotificationDisplay/>
