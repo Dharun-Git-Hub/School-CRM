@@ -28,7 +28,11 @@ router.post('/getTimeline',GradeAdminController.getTimeline)
 router.post('/deleteTimeline',GradeAdminController.deleteTimeline)
 router.post('/getStaffNames',GradeAdminController.getStaffNames)
 router.post('/getCounts',GradeAdminController.getCounts)
-router.post('/getOverview',GradeAdminController.getOverview)
+router.post('/getOverGrades',GradeAdminController.getOverGrades)
+router.post('/getOverSections',GradeAdminController.getOverSections)
+router.post('/getOverStudents',GradeAdminController.getOverStudents)
+router.post('/getOverSubjects',GradeAdminController.getOverSubjects)
+router.post('/getOverTeachers',GradeAdminController.getOverTeachers)
 router.get('/logs',GradeAdminController.logs)
 
 module.exports = router

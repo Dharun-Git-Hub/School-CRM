@@ -21,7 +21,10 @@ router.post('/getTimeline',StaffController.getTimeline)
 router.post('/getRemaining',StaffController.getRemaining)
 router.post('/assignMarks',StaffController.assignMarks)
 router.post('/loadStudentNames',StaffController.loadStudentNames)
-router.post('/getOverview',StaffController.getOverview)
 router.post('/loadGradeName',StaffController.loadGradeName)
+router.post('/getOverSections',StaffController.getOverSections)
+router.post('/getOverStudents',StaffController.getOverStudents)
+router.post('/getOverSubjects',StaffController.getOverSubjects)
+router.post('/giveStudentList',StaffController.giveStudentList)
 
 module.exports = router;

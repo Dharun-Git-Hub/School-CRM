@@ -47,7 +47,7 @@ exports.verifyOTP = (req,res) => {
     const {from,otp} = req.body;
     console.log(from,otp)
     if(validateOTP(from,Number(otp))){
-        const token = jwt.sign({email:from},jwtsecret,{expiresIn: "50m"})
+        const token = jwt.sign({email:from},jwtsecret,{expiresIn: "1d"})
         console.log(token);
         return res.json({status:"success", token: token})
     }
@@ -861,18 +861,62 @@ exports.getCounts = async (req,res) => {
     }
 }
 
-exports.getOverview = async (req,res) => {
+exports.getOverStudents = async (req,res) => {
     try{
-        const {grade} = req.body;
-        const students = await Student.find({grade})
-        const teachers = await Teacher.find({grade})
-        const subjects = await Subject.find({grade:{$in:grade}})
-        const grades = await Grade.find({grade})
-        const sections = await Section.find({grade})
-        return res.json({status:'success',list:{students,teachers,subjects,grades,sections}})
+        const {details} = req.body;
+        const decrypted = JSON.parse(decryptRandom(details))
+        const gradeAdmins = await Student.find({grade:decrypted.grade}).skip(decrypted.skip).limit(decrypted.limit)
+        return res.json({status:'success',list:gradeAdmins})
     }
     catch(err){
-        console.log(err)
+        return res.json({status:"failure",message:'Something went wrong'})
+    }
+}
+
+exports.getOverTeachers = async (req,res) => {
+    try{
+        const {details} = req.body;
+        const decrypted = JSON.parse(decryptRandom(details))
+        const gradeAdmins = await Teacher.find({grade:decrypted.grade}).skip(decrypted.skip).limit(decrypted.limit)
+        return res.json({status:'success',list:gradeAdmins})
+    }
+    catch(err){
+        return res.json({status:"failure",message:'Something went wrong'})
+    }
+}
+
+exports.getOverSubjects = async (req,res) => {
+    try{
+        const {details} = req.body;
+        const decrypted = JSON.parse(decryptRandom(details))
+        const gradeAdmins = await Subject.find({grade:{$in:decrypted.grade}}).skip(decrypted.skip).limit(decrypted.limit)
+        return res.json({status:'success',list:gradeAdmins})
+    }
+    catch(err){
+        return res.json({status:"failure",message:'Something went wrong'})
+    }
+}
+
+exports.getOverGrades = async (req,res) => {
+    try{
+        const {details} = req.body;
+        const decrypted = JSON.parse(decryptRandom(details))
+        const gradeAdmins = await Grade.find({grade:decrypted.grade}).skip(decrypted.skip).limit(decrypted.limit)
+        return res.json({status:'success',list:gradeAdmins})
+    }
+    catch(err){
+        return res.json({status:"failure",message:'Something went wrong'})
+    }
+}
+
+exports.getOverSections = async (req,res) => {
+    try{
+        const {details} = req.body;
+        const decrypted = JSON.parse(decryptRandom(details))
+        const gradeAdmins = await Section.find({grade:decrypted.grade}).skip(decrypted.skip).limit(decrypted.limit)
+        return res.json({status:'success',list:gradeAdmins})
+    }
+    catch(err){
         return res.json({status:"failure",message:'Something went wrong'})
     }
 }

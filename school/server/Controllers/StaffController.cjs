@@ -21,7 +21,7 @@ exports.login = async(req,res) => {
     const exists = await TeacherModel.exists({email:decrypted.email, password: decrypted.password})
     if(!exists)
         return res.json({status:"failure",message: "Invalid Email or Password!"});
-    const token = jwt.sign({email:decrypted.email},jwtsecret,{expiresIn: "50m"})
+    const token = jwt.sign({email:decrypted.email},jwtsecret,{expiresIn: "1d"})
     await Logs.insertOne({action:`Staff with email: ${decrypted.email} logged in !`,who: `Staff with MailID: ${decrypted.email}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super","Grade"]})
     return res.json({status:"success",token:token})
 }
@@ -148,21 +148,84 @@ exports.markAttendance = async (req,res) => {
         if(!exists)
             return res.json({status:"failure",message:"Unauthorized Access!"})
         if(new Date(year,month-1,day).toLocaleDateString() === new Date().toLocaleDateString()){
+            const allStudents = await Student.find({section,grade,academic_year:year})
+            const studentsList = []
+            allStudents.map((e)=>{
+                studentsList.push(e.roll)
+            })
+            console.log('Total Students List: ',studentsList)
+            const absentees = studentsList.filter((e)=>!students.includes(e))
+            console.log('Absentees List: ',absentees)
             const marked = await Attendance.exists({section,grade,year,month,day})
             console.log(marked);
             if(marked){
+                console.log('Staff Attendance Initiated...')
                 await Attendance.updateOne(
                     { section,grade,year,month,day },
                     { $set: { students } }
                 )
+                const totalDays = await Attendance.find({section,grade,year}).countDocuments()
+                for(let roll of students){
+                    console.log('\n\n\nTeacher Marking attendance')
+                    const presentDays = await Attendance.find({
+                        section,grade,year,
+                        students: { $in: roll }
+                    }).countDocuments()
+                    const absent = totalDays - presentDays;
+                    console.log('Present - roll: ',presentDays)
+                    console.log('Absent: - roll:',absent)
+                    const percent = ((presentDays) / totalDays) * 100
+                    await Student.updateOne({grade,section,roll},{$set:{attendance: Number(percent).toPrecision(4)}})
+                }
+                if(absentees.length>0){
+                    for(let roll of absentees){
+                        console.log('\n\n\nTeacher Marking attendance')
+                        const presentDays = await Attendance.find({
+                            section,grade,year,
+                            students: { $in: roll }
+                        }).countDocuments()
+                        const absent = totalDays - presentDays;
+                        console.log('Present - roll: ',presentDays)
+                        console.log('Absent: - roll:',absent)
+                        const percent = ((presentDays) / totalDays) * 100
+                        await Student.updateOne({grade,section,roll},{$set:{attendance: Number(percent).toPrecision(4)}})
+                    }
+                }
                 await Logs.insertOne({action:`Staff with name: ${name} just updated attendance for grade: ${grade}, section: ${section} for Date: ${day}-${month}-${year}`,who: `Staff with name: ${name}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super","Grade"]})
                 return res.json({status:"success",message:"Attendance Marked!"})
             }
             else{
                 await Logs.insertOne({action:`Staff with name: ${name} just marked attendance for grade: ${grade}, section: ${section} for Date: ${day}-${month}-${year}`,who: `Staff with name: ${name}`,time: `${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}`,to:["Super","Grade"]})
                 await Attendance.insertOne(decrypted);
+                const totalDays = await Attendance.find({section,grade,year}).countDocuments()
+                for(let roll of students){
+                    const presentDays = await Attendance.find({
+                        section,grade,year,
+                        students: { $in: roll }
+                    }).countDocuments()
+                    const absent = totalDays - presentDays;
+                    console.log('Present: ',presentDays)
+                    console.log('Absent: ',absent)
+                    const percent = (presentDays / totalDays) * 100
+                    await Student.updateOne({grade,section,roll},{$set:{attendance: Number(percent).toPrecision(4)}})
+                }
+                if(absentees.length>0){
+                    for(let roll of absentees){
+                        console.log('\n\n\nTeacher Marking attendance')
+                        const presentDays = await Attendance.find({
+                            section,grade,year,
+                            students: { $in: roll }
+                        }).countDocuments()
+                        const absent = totalDays - presentDays;
+                        console.log('Present - roll: ',presentDays)
+                        console.log('Absent: - roll:',absent)
+                        const percent = ((presentDays) / totalDays) * 100
+                        await Student.updateOne({grade,section,roll},{$set:{attendance: Number(percent).toPrecision(4)}})
+                    }
+                }
                 return res.json({status:"success",message:"Attendance Marked!"})
             }
+            
         }
         else{
             return res.json({status:"failure", message:`Mark attendance for present date only! (${new Date().toLocaleDateString()})`})
@@ -413,16 +476,50 @@ exports.loadGradeName = async (req,res) => {
     }
 }
 
-exports.getOverview = async (req,res) => {
+exports.giveStudentList = async (req,res) => {
     try{
-        const {grade,section} = req.body;
-        const students = await Student.find({grade,section})
-        const subjects = await Subject.find({grade:{$in:grade}})
-        const sections = await Section.find({grade,name: section})
-        return res.json({status:'success',list:{students,subjects,sections}})
+        const {section,grade} = req.body;
+        const response = await Student.find({section,grade})
+        return res.json({status:'success',list:response})
     }
     catch(err){
         console.log(err)
+        return res.json({status:"failure",message:'Something went wrong'})
+    }
+}
+
+exports.getOverSubjects = async (req,res) => {
+    try{
+        const {details} = req.body;
+        const decrypted = JSON.parse(decryptRandom(details))
+        const gradeAdmins = await Subject.find({grade:{$in:decrypted.grade}}).skip(decrypted.skip).limit(decrypted.limit)
+        return res.json({status:'success',list:gradeAdmins})
+    }
+    catch(err){
+        return res.json({status:"failure",message:'Something went wrong'})
+    }
+}
+
+exports.getOverSections = async (req,res) => {
+    try{
+        const {details} = req.body;
+        const decrypted = JSON.parse(decryptRandom(details))
+        const gradeAdmins = await Section.find({grade:decrypted.grade,name:decrypted.section}).skip(decrypted.skip).limit(decrypted.limit)
+        return res.json({status:'success',list:gradeAdmins})
+    }
+    catch(err){
+        return res.json({status:"failure",message:'Something went wrong'})
+    }
+}
+
+exports.getOverStudents = async (req,res) => {
+    try{
+        const {details} = req.body;
+        const decrypted = JSON.parse(decryptRandom(details))
+        const gradeAdmins = await Student.find({grade:decrypted.grade,section:decrypted.section}).skip(decrypted.skip).limit(decrypted.limit)
+        return res.json({status:'success',list:gradeAdmins})
+    }
+    catch(err){
         return res.json({status:"failure",message:'Something went wrong'})
     }
 }
