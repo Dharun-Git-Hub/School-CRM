@@ -119,12 +119,15 @@ const SuperAdminDash = ({socket}) => {
                 <SuperAddGradeAdmin/>
                 {socket && <SuperAdminPanel socket={socket}/>}
                 {counts !== null && counts.hasOwnProperty('studentsCount') && 
-                <CountsComponent 
+                <div onClick={()=>navigate('super-overview')}>
+                    <CountsComponent
                     studentsCount={counts.studentsCount}
                     teachersCount={counts.teachersCount}
                     gradesCount={counts.gradesCount}
                     subjectsCount={counts.subjectsCount}
                     />
+                </div>
+                
                 }
             </div>
         </div>

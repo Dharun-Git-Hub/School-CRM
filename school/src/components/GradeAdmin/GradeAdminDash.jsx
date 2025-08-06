@@ -124,13 +124,16 @@ const GradeAdminDash = ({socket}) => {
                     {socket && myGrade.trim() !== '' && <GradeAdminPanel socket={socket} grade={myGrade}/>}
                 </div>
             </div>
-            {counts !== null && counts.hasOwnProperty('studentsCount') && 
-            <CountsComponent 
+            {counts !== null && counts.hasOwnProperty('studentsCount') && myGrade &&
+            <div onClick={()=>navigate('grade-overview',{state:myGrade})}>
+                <CountsComponent 
                 studentsCount={counts.studentsCount}
                 teachersCount={counts.teachersCount}
                 sectionsCount={counts.sectionsCount}
                 subjectsCount={counts.subjectsCount}
                 />
+            </div>
+            
             }
         </div>
     )
