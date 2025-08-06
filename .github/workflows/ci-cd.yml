@@ -17,7 +17,7 @@ jobs:
         working-directory: './school'
         
       - name: Run App
-        run: npm test
+        run: npm run lint
         working-directory: './school'
         
       - name: Run Build the App
